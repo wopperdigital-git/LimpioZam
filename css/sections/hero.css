@@ -12,21 +12,34 @@
      inflating on large monitors. Equals exactly 1px at the 1280x832 design size. */
   --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
 
-  /* Half-width of the fan.
-     Card sizes follow --u so the deck always fits the height, but on a short,
-     wide screen that alone pulls the outer cards inboard and the bleed is lost.
-     The second term is the spread needed for the outermost card to clear the
-     viewport edge with 18 design px to spare; at 1280x832 the first term wins,
-     so the designed composition is preserved exactly. */
-  --spread: max(39.22vw, 50vw - 138.5 * var(--u));
+  /* The deck's own unit. Size and spread must share one factor, or the cards
+     drift apart and gaps open between them. Driven by width so the band always
+     spans the viewport and the outer cards keep bleeding; never below --u, so a
+     tall window still gets the composition at its designed size. Equals 1px at
+     1280x832, so the design is reproduced exactly there. */
+  --ud: max(var(--u), calc(100vw / 1280));
+
+  /* Half-width of the fan, in the deck's own unit. */
+  --spread: calc(502 * var(--ud));
 
   /* Height left over once the composition has hit its --u ceiling. Split above
      and below the copy so a tall monitor doesn't open one dead band between the
      button and the deck. Zero at the design size, so nothing shifts there. */
   --surplus: max(0px, 100svh - 832 * var(--u));
 
-  --card-radius: calc(12 * var(--u));
-  --card-shadow: 0 calc(2 * var(--u)) calc(6 * var(--u)) rgb(43 28 18 / 0.28);
+  /* How far the deck must slide down to keep clear of the copy.
+     On a short, wide window the deck (width-driven) outgrows the copy
+     (height-driven) and would ride up over the button. Pushing it down instead
+     crops the cards against the bottom edge, which reads as bleed rather than a
+     collision, and keeps the deck's internal spacing untouched.
+     571u = the button's baseline in the copy flow plus the 40px the design
+     leaves beneath it; 260.5ud = the centre card's top above the hero's bottom.
+     Resolves to 0px at 1280x832, so the design is untouched there. */
+  --deck-drop: max(0px, calc(571 * var(--u) + var(--surplus) / 2
+                             + 260.5 * var(--ud) - 100svh));
+
+  --card-radius: calc(12 * var(--ud));
+  --card-shadow: 0 calc(2 * var(--ud)) calc(6 * var(--ud)) rgb(43 28 18 / 0.28);
 
   position: relative;
   display: flex;
@@ -119,15 +132,15 @@
    Card deck
    Each card sits in a slot that owns its resting position, so GSAP is free to
    own the card's own transform without fighting the layout.
-   Sizes scale with --u so the deck always fits the height; the horizontal
-   spread is in vw so the outer cards keep bleeding off both edges on wide
-   screens, where --u alone would pull them inboard.
+   The whole deck is laid out in --ud, one shared unit for both size and
+   spread, so neighbouring cards keep their designed overlap at every width.
    -------------------------------------------------------------------------- */
 
 .hero__deck {
   position: absolute;
   inset: 0;
   z-index: 1;
+  transform: translateY(var(--deck-drop));
   pointer-events: none;
 }
 
@@ -135,9 +148,9 @@
   position: absolute;
   left: 50%;
   bottom: 0;
-  width: calc(var(--w) * var(--u));
-  height: calc(var(--h) * var(--u));
-  transform: translate(-50%, 50%) translate(var(--x), calc(var(--cy) * var(--u) * -1));
+  width: calc(var(--w) * var(--ud));
+  height: calc(var(--h) * var(--ud));
+  transform: translate(-50%, 50%) translate(var(--x), calc(var(--cy) * var(--ud) * -1));
 }
 
 .hero__card {
