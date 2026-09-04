@@ -51,6 +51,10 @@ html {
 
 body {
   min-height: 100vh;
+  /* Hero cards deliberately bleed past both viewport edges.
+     `clip` rather than `hidden` so position: sticky still works for
+     ScrollTrigger pinning in later sections. */
+  overflow-x: clip;
   background-color: var(--c-bg);
   color: var(--c-text);
   font-family: var(--font-body);
@@ -129,7 +133,23 @@ p {
 }
 
 /* --------------------------------------------------------------------------
-   4. Accessibility
+   4. On-load animation guard
+   Elements that animate in are held back until GSAP has rendered their start
+   state, otherwise the finished layout flashes for a frame. Scoped to .js so
+   content stays visible if JavaScript never runs; main.js adds the ready class
+   in a `finally`, so a thrown error cannot leave the page blank either.
+   -------------------------------------------------------------------------- */
+
+.js [data-anim] {
+  visibility: hidden;
+}
+
+.js.is-anim-ready [data-anim] {
+  visibility: visible;
+}
+
+/* --------------------------------------------------------------------------
+   5. Accessibility
    -------------------------------------------------------------------------- */
 
 :focus-visible {
