@@ -1,0 +1,124 @@
+/* ==========================================================================
+   REASONS - "What Makes Us Different"
+   A strip wider than the viewport that travels horizontally while the section
+   is pinned. Values are in design pixels for a 1280-wide viewport, scaled by
+   the shared --u so the section tracks the hero.
+
+   NOTE: the reference exports were crops rather than full-viewport frames, so
+   the numbers below are derived from proportions (card aspect 1.256 held across
+   all four exports) rather than measured directly. They are gathered here so
+   exact Figma values can be dropped in without touching anything else.
+   ========================================================================== */
+
+.reasons {
+  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
+
+  /* -- design values, replace with exact Figma numbers when available -- */
+  --pad-x: 78;         /* strip's leading and trailing margin */
+  --intro-w: 420;      /* must clear the lead's longest line (406) so it wraps to 4 */
+  --copy-w: 275;       /* clears the description's longest line (260), wraps to 2 */
+  --card-w: 348;
+  --card-h: 277;
+  --gap-intro: 146;    /* intro -> first item */
+  --gap-copy-card: 34; /* item copy -> its card */
+  --gap-item: 113;     /* card -> next item's copy */
+
+  /* Solved by fitting rendered ink widths to the export, the same method used
+     for the hero. Both heading faces come out the same size, as in the hero. */
+  --title-size: 47;
+  --title-accent-size: 47;
+  --lead-size: 20.5;
+  --num-size: 32;
+  --desc-size: 17;
+
+  position: relative;
+  background-color: var(--c-bg);
+}
+
+.reasons__viewport {
+  /* Without JS this degrades to an ordinary horizontal scroller, so the content
+     stays reachable if the pinned animation never initialises. */
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.reasons__strip {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  min-height: 100svh;
+  padding-inline: calc(var(--pad-x) * var(--u));
+  gap: calc(var(--gap-item) * var(--u));
+}
+
+/* --------------------------------------------------------------------------
+   Intro
+   -------------------------------------------------------------------------- */
+
+.reasons__intro {
+  flex: none;
+  width: calc(var(--intro-w) * var(--u));
+  margin-inline-end: calc((var(--gap-intro) - var(--gap-item)) * var(--u));
+}
+
+.reasons__title {
+  font-family: var(--font-body);
+  font-weight: var(--fw-bold);
+  font-size: calc(var(--title-size) * var(--u));
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: var(--c-text);
+}
+
+.reasons__title em {
+  display: block;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: var(--fw-bold);
+  font-size: calc(var(--title-accent-size) * var(--u));
+  color: var(--c-primary);
+}
+
+.reasons__lead {
+  margin-top: calc(16 * var(--u));
+  font-size: calc(var(--lead-size) * var(--u));
+  line-height: 1.15;
+  color: rgb(43 28 18 / 0.75);
+}
+
+/* --------------------------------------------------------------------------
+   Numbered items
+   -------------------------------------------------------------------------- */
+
+.reasons__item {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--gap-copy-card) * var(--u));
+}
+
+.reasons__copy {
+  width: calc(var(--copy-w) * var(--u));
+}
+
+.reasons__num {
+  font-family: var(--font-accent);
+  font-size: calc(var(--num-size) * var(--u));
+  line-height: 1;
+  color: var(--c-text);
+}
+
+.reasons__desc {
+  margin-top: calc(27 * var(--u));
+  font-size: calc(var(--desc-size) * var(--u));
+  line-height: 1.15;
+  color: rgb(43 28 18 / 0.75);
+}
+
+.reasons__card {
+  flex: none;
+  width: calc(var(--card-w) * var(--u));
+  height: calc(var(--card-h) * var(--u));
+  border-radius: calc(12 * var(--u));
+  background-color: #097063;
+}

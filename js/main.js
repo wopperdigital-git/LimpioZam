@@ -6,6 +6,7 @@
    ========================================================================== */
 
 import { initHero } from './sections/hero.js';
+import { initReasons } from './sections/reasons.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -53,6 +54,7 @@ function initSections() {
       const { animate } = context.conditions;
 
       initHero({ animate });
+      initReasons({ animate });
     },
   );
 }

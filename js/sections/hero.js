@@ -36,6 +36,7 @@ export function initHero({ animate }) {
   const title = hero.querySelector('.hero__title');
   const subtitle = hero.querySelector('.hero__subtitle');
   const actions = hero.querySelector('.hero__actions');
+  const deck = hero.querySelector('.hero__deck');
   const cards = gsap.utils.toArray('.hero__card', hero);
   const slots = gsap.utils.toArray('.hero__card-slot', hero);
 
@@ -112,6 +113,47 @@ export function initHero({ animate }) {
 
     return tl;
   };
+
+  /**
+   * Exit: the fan closes back into a deck, the outer cards drop away, and the
+   * stack fades as section two arrives. Scrubbed against scroll while the hero
+   * is pinned, so the visitor drives it and it reverses cleanly.
+   *
+   * The tweens use immediateRender: false so they record their start values
+   * when the scrub first moves rather than at build time, when the entrance
+   * still has the cards parked below the fold.
+   */
+  const buildExit = () => {
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: hero,
+        start: 'top top',
+        end: '+=90%',
+        pin: true,
+        scrub: 0.6,
+        invalidateOnRefresh: true,
+      },
+    });
+
+    tl.to(fanCards, {
+      x: (i, el) => stackX(indexOfCard(el)),
+      rotation: 0,
+      ease: 'power2.inOut',
+      duration: 0.6,
+      immediateRender: false,
+    }, 0)
+      .to(sweepCards, {
+        y: (i, el) => offscreenY(indexOfCard(el)),
+        ease: 'power2.in',
+        duration: 0.45,
+        immediateRender: false,
+      }, 0.35)
+      .to(deck, { autoAlpha: 0, ease: 'none', duration: 0.25, immediateRender: false }, 0.78);
+
+    return tl;
+  };
+
+  buildExit();
 
   SplitText.create(title, {
     type: 'lines',
