@@ -1,0 +1,45 @@
+/* ==========================================================================
+   LAYOUT - shared containers, section rhythm, small helpers
+   ========================================================================== */
+
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.section {
+  position: relative;
+  padding-block: 120px;
+}
+
+/* --------------------------------------------------------------------------
+   Image placeholder
+   Stand-in for artwork not yet exported from Figma.
+   Usage: <div class="placeholder"></div>
+   Override the aspect ratio inline or per section, e.g. style="aspect-ratio: 4/5"
+   -------------------------------------------------------------------------- */
+
+.placeholder {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  background-color: var(--c-secondary);
+  border-radius: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Helpers
+   -------------------------------------------------------------------------- */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
+}
