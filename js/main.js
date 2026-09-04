@@ -5,8 +5,7 @@
    init function that receives whether it is allowed to animate.
    ========================================================================== */
 
-// Section imports land here as each section is built:
-// import { initHero } from './sections/hero.js';
+import { initHero } from './sections/hero.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -53,9 +52,7 @@ function initSections() {
     (context) => {
       const { animate } = context.conditions;
 
-      // initHero({ animate });
-
-      void animate;
+      initHero({ animate });
     },
   );
 }

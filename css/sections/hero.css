@@ -1,0 +1,179 @@
+/* ==========================================================================
+   HERO
+   Measured against a 1280 x 832 Figma frame. Every length is written as its
+   design-pixel number multiplied by --u, so the numbers here match the design
+   one for one and the whole composition scales as a unit.
+   ========================================================================== */
+
+.hero {
+  /* One design pixel.
+     Driven by whichever axis is tighter so the composition always fits, with a
+     floor that keeps type readable on short laptops and a ceiling that stops it
+     inflating on large monitors. Equals exactly 1px at the 1280x832 design size. */
+  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
+
+  /* Half-width of the fan.
+     Card sizes follow --u so the deck always fits the height, but on a short,
+     wide screen that alone pulls the outer cards inboard and the bleed is lost.
+     The second term is the spread needed for the outermost card to clear the
+     viewport edge with 18 design px to spare; at 1280x832 the first term wins,
+     so the designed composition is preserved exactly. */
+  --spread: max(39.22vw, 50vw - 138.5 * var(--u));
+
+  /* Height left over once the composition has hit its --u ceiling. Split above
+     and below the copy so a tall monitor doesn't open one dead band between the
+     button and the deck. Zero at the design size, so nothing shifts there. */
+  --surplus: max(0px, 100svh - 832 * var(--u));
+
+  --card-radius: calc(12 * var(--u));
+  --card-shadow: 0 calc(2 * var(--u)) calc(6 * var(--u)) rgb(43 28 18 / 0.28);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  overflow: hidden; /* the outer cards bleed past both edges */
+}
+
+/* --------------------------------------------------------------------------
+   Header - logo only for now, navbar comes later
+   -------------------------------------------------------------------------- */
+
+.site-header {
+  position: relative;
+  z-index: 2;
+  padding: calc(20 * var(--u)) calc(78 * var(--u)) 0;
+}
+
+.site-header__logo {
+  display: block;
+  width: calc(55 * var(--u));
+}
+
+/* --------------------------------------------------------------------------
+   Copy
+   -------------------------------------------------------------------------- */
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(var(--surplus) / 2);
+  text-align: center;
+}
+
+.hero__title {
+  /* Sized so the copy breaks into the three designed lines on its own, rather
+     than relying on hard <br>s that would fight the fluid scaling. */
+  max-width: calc(680 * var(--u));
+  margin: calc(62 * var(--u)) auto 0;
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  font-size: calc(65 * var(--u));
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--c-text);
+  text-wrap: initial; /* balance would override the designed line breaks */
+}
+
+.hero__title em {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: var(--fw-bold);
+  color: var(--c-primary);
+}
+
+.hero__subtitle {
+  /* Left-aligned block, centred on the page - not centred text. */
+  width: calc(275 * var(--u));
+  margin: calc(32 * var(--u)) auto 0;
+  font-size: calc(22 * var(--u));
+  line-height: 1.05;
+  letter-spacing: 0.05em;
+  text-align: left;
+  color: rgb(43 28 18 / 0.6);
+}
+
+.hero__actions {
+  margin-top: calc(51 * var(--u));
+}
+
+.hero__cta {
+  display: inline-block;
+  padding: calc(10 * var(--u)) calc(31.7 * var(--u));
+  border-radius: calc(5 * var(--u));
+  background-color: var(--c-primary);
+  color: var(--c-bg);
+  font-weight: var(--fw-semibold);
+  font-size: calc(25 * var(--u));
+  line-height: 1;
+  letter-spacing: 0.01em;
+  transition: background-color 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+
+.hero__cta:hover {
+  background-color: #f2621a;
+  transform: translateY(calc(-2 * var(--u)));
+}
+
+/* --------------------------------------------------------------------------
+   Card deck
+   Each card sits in a slot that owns its resting position, so GSAP is free to
+   own the card's own transform without fighting the layout.
+   Sizes scale with --u so the deck always fits the height; the horizontal
+   spread is in vw so the outer cards keep bleeding off both edges on wide
+   screens, where --u alone would pull them inboard.
+   -------------------------------------------------------------------------- */
+
+.hero__deck {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero__card-slot {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: calc(var(--w) * var(--u));
+  height: calc(var(--h) * var(--u));
+  transform: translate(-50%, 50%) translate(var(--x), calc(var(--cy) * var(--u) * -1));
+}
+
+.hero__card {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--card-radius);
+  background-color: var(--card-color);
+  box-shadow: var(--card-shadow);
+  transform: rotate(var(--rot));
+  will-change: transform;
+}
+
+/* Back to front: outermost pair, then the next pair, then the flanking pair,
+   with the untilted centre card on top. */
+.hero__card-slot--0,
+.hero__card-slot--6 { z-index: 1; --w: 253; --h: 253; --cy: 168; }
+.hero__card-slot--1,
+.hero__card-slot--5 { z-index: 2; --w: 269; --h: 269; --cy: 160; }
+.hero__card-slot--2,
+.hero__card-slot--4 { z-index: 3; --w: 226; --h: 226; --cy: 139; }
+.hero__card-slot--3 { z-index: 4; --w: 272; --h: 248; --cy: 136.5; }
+
+/* Offsets as a fraction of the fan's half-width, so the whole deck widens
+   together rather than only stretching at the ends. */
+.hero__card-slot--0 { --x: calc(-1 * var(--spread)); }
+.hero__card-slot--1 { --x: calc(-0.6992 * var(--spread)); }
+.hero__card-slot--2 { --x: calc(-0.4741 * var(--spread)); }
+.hero__card-slot--3 { --x: 0px; }
+.hero__card-slot--4 { --x: calc(0.4741 * var(--spread)); }
+.hero__card-slot--5 { --x: calc(0.6992 * var(--spread)); }
+.hero__card-slot--6 { --x: calc(1 * var(--spread)); }
+
+.hero__card--0 { --rot: 16deg;    --card-color: rgb(14 124 110 / 0.82); }
+.hero__card--1 { --rot: 8.75deg;  --card-color: #0e7c6e; }
+.hero__card--2 { --rot: 3.5deg;   --card-color: #079e8b; }
+.hero__card--3 { --rot: 0deg;     --card-color: #097063; }
+.hero__card--4 { --rot: -3.5deg;  --card-color: #079e8b; }
+.hero__card--5 { --rot: -8.75deg; --card-color: #0e7c6e; }
+.hero__card--6 { --rot: -16deg;   --card-color: rgb(14 124 110 / 0.82); }
