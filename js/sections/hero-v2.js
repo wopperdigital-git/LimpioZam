@@ -128,29 +128,32 @@ export function initHeroV2({ animate }) {
     },
   });
 
-  // 1. the label goes and the tool assembles. The copy clears here rather than
-  // later, because the handle grows straight up through where the subtitle sits.
-  tl.to(cta, { autoAlpha: 0, duration: 0.12, ease: 'none' }, 0)
-    .to([title, subtitle], { autoAlpha: 0, y: -14, duration: 0.2, ease: 'none' }, 0.03)
-    .to(handle, { scaleY: 1, duration: 0.22, ease: 'power2.out' }, 0.04)
-    .to(grip, { scaleY: 1, autoAlpha: 1, duration: 0.14, ease: 'power2.out' }, 0.2)
+  // 1. the copy clears. A long linear fade rather than a quick blip, and the
+  // handle waits until it is done so nothing grows through the subtitle.
+  tl.to([title, subtitle], { autoAlpha: 0, duration: 0.3, ease: 'none' }, 0)
 
-  // 2. it grows, and the copy clears the stage before the colour arrives
-    .to(squeegee, { scale: SHAPE.growth, duration: 0.4, ease: 'power1.inOut' }, 0.34)
+  // The label fades over the squeegee's own head, which is the same size and
+  // now carries the same blade, so the swap is invisible.
+    .to(cta, { autoAlpha: 0, duration: 0.15, ease: 'none' }, 0)
+
+  // 2. the tool assembles on a clear stage, then grows
+    .to(handle, { scaleY: 1, duration: 0.22, ease: 'power2.out' }, 0.3)
+    .to(grip, { scaleY: 1, autoAlpha: 1, duration: 0.14, ease: 'power2.out' }, 0.46)
+    .to(squeegee, { scale: SHAPE.growth, duration: 0.27, ease: 'power1.inOut' }, 0.55)
 
   // 3. the head spreads to full bleed and becomes the next section's colour.
     // The container unwinds its scale over the same beat, so the head's own
     // width and height land on the hero's exactly rather than 2.3x them.
-    .to(squeegee, { scale: 1, duration: 0.35, ease: 'power2.inOut' }, 0.74)
+    .to(squeegee, { scale: 1, duration: 0.18, ease: 'power2.inOut' }, 0.82)
     .to(head, {
       width: () => base.heroW,
       height: () => base.heroH,
       x: 0,
       y: 0,
       borderRadius: 0,
-      duration: 0.35,
+      duration: 0.18,
       ease: 'power2.inOut',
-    }, 0.74)
-    .to([lip, handle, grip], { autoAlpha: 0, duration: 0.18, ease: 'none' }, 0.74)
-    .to(logo, { autoAlpha: 0, duration: 0.18, ease: 'none' }, 0.78);
+    }, 0.82)
+    .to([lip, handle, grip], { autoAlpha: 0, duration: 0.1, ease: 'none' }, 0.82)
+    .to(logo, { autoAlpha: 0, duration: 0.1, ease: 'none' }, 0.85);
 }

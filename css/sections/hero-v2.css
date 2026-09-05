@@ -78,9 +78,15 @@
   margin-top: calc(51 * var(--u));
 }
 
+/* The button carries the blade from the start, so it already reads as a
+   squeegee head before any scrolling. The squeegee's own head and lip sit
+   directly beneath it at matching size, which is what makes the handover
+   invisible when the label fades. */
 .hero__cta {
+  position: relative;
+  overflow: hidden;
   display: inline-block;
-  padding: calc(10 * var(--u)) calc(31.7 * var(--u));
+  padding: calc(10 * var(--u)) calc(31.7 * var(--u)) calc(14 * var(--u));
   border-radius: calc(5 * var(--u));
   background-color: var(--c-primary);
   color: var(--c-bg);
@@ -88,6 +94,14 @@
   font-size: calc(25 * var(--u));
   line-height: 1;
   letter-spacing: 0.01em;
+}
+
+.hero__cta::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 22%;   /* matches SHAPE.lipH, so the squeegee's lip lines up exactly */
+  background-color: #c9541a;
 }
 
 /* --------------------------------------------------------------------------
@@ -121,9 +135,11 @@
 
 /* The rubber strip along the bottom of the blade. Fades out as the head
    spreads, since a full-bleed background has no edge to speak of. */
+/* Same radius as the button, whose overflow clips its own blade to that
+   curve - otherwise the corners would jump at the handover. */
 .squeegee__lip {
   background-color: #c9541a;
-  border-radius: 0 0 calc(4 * var(--u)) calc(4 * var(--u));
+  border-radius: 0 0 calc(5 * var(--u)) calc(5 * var(--u));
 }
 
 /* The shaft, growing upward out of the blade. */
