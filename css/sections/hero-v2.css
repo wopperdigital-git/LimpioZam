@@ -1,8 +1,8 @@
 /* ==========================================================================
    HERO (v2 - redesign sandbox)
    Cards removed and the copy centred. The call to action doubles as the head
-   of a squeegee: on scroll it grows a handle, scales up, then the head spreads
-   to fill the screen and carries straight into the next section's background.
+   itself: it carries the rubber blade, and on scroll it grows and then spreads
+   to fill the screen, carrying straight into the next section's background.
 
    Loaded only by hero-v2.html; the live hero on index.html is untouched.
    ========================================================================== */
@@ -106,8 +106,9 @@
 
 /* --------------------------------------------------------------------------
    Squeegee
-   Sits directly over the button and takes the colour with it, so the eye
-   follows one object from button to full-bleed background. Geometry is set
+   The blade is the whole tool: it sits directly over the button, which already
+   carries the same rubber edge, so the eye follows one object from button to
+   full-bleed background. Geometry is set
    from the button's measured box in JS, so it survives any scale.
    -------------------------------------------------------------------------- */
 
@@ -142,13 +143,3 @@
   border-radius: 0 0 calc(5 * var(--u)) calc(5 * var(--u));
 }
 
-/* The shaft, growing upward out of the blade. */
-.squeegee__handle {
-  border-radius: calc(4 * var(--u));
-  transform-origin: 50% 100%;
-}
-
-.squeegee__grip {
-  border-radius: calc(6 * var(--u));
-  background-color: #c9541a;
-}
