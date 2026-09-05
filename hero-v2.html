@@ -29,12 +29,28 @@
       display: grid;
       place-items: center;
       min-height: 100svh;
-      background-color: #efe9dc;
+      /* Stands in for "What Makes Us Different", which now wears the colour
+         the squeegee head spreads into. */
+      background-color: #ff712d;
+      padding: 0 8vw;
       font-family: 'Poppins', sans-serif;
-      font-size: 14px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgb(43 28 18 / 0.4);
+      color: #f9f6ef;
+      text-align: center;
+    }
+
+    .sandbox-next p:first-child {
+      font-weight: 700;
+      font-size: clamp(28px, 3.6vw, 48px);
+      line-height: 1.2;
+    }
+
+    .sandbox-next p:last-child {
+      margin-top: 1.2em;
+      font-size: clamp(15px, 1.4vw, 19px);
+      line-height: 1.5;
+      opacity: 0.85;
+      max-width: 46ch;
+      margin-inline: auto;
     }
   </style>
 </head>
@@ -60,35 +76,23 @@
       </div>
     </div>
 
-    <!-- Decorative stand-ins for photography still to be supplied. -->
-    <div class="hero__deck" aria-hidden="true" data-anim>
-      <div class="hero__card-slot hero__card-slot--0">
-        <div class="hero__card hero__card--0"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--1">
-        <div class="hero__card hero__card--1"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--2">
-        <div class="hero__card hero__card--2"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--3">
-        <div class="hero__card hero__card--3"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--4">
-        <div class="hero__card hero__card--4"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--5">
-        <div class="hero__card hero__card--5"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--6">
-        <div class="hero__card hero__card--6"></div>
-      </div>
+    <div class="squeegee" aria-hidden="true">
+      <div class="squeegee__part squeegee__grip"></div>
+      <div class="squeegee__part squeegee__handle"></div>
+      <div class="squeegee__part squeegee__head"></div>
+      <div class="squeegee__part squeegee__lip"></div>
     </div>
 
   </section>
 
   <main>
-    <section class="sandbox-next">next section starts here</section>
+    <section class="sandbox-next">
+      <div>
+        <p>What Makes Us Different</p>
+        <p>Stand-in for section two. Its background is the colour the squeegee
+          head spreads into, so the wipe carries straight through.</p>
+      </div>
+    </section>
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
