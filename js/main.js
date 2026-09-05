@@ -7,6 +7,7 @@
 
 import { initHero } from './sections/hero.js';
 import { initReasons } from './sections/reasons.js';
+import { initServices } from './sections/services.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -55,6 +56,7 @@ function initSections() {
 
       initHero({ animate });
       initReasons({ animate });
+      initServices({ animate });
     },
   );
 }
