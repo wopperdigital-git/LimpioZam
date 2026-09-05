@@ -1,0 +1,150 @@
+/* ==========================================================================
+   FOOTER
+   A cream panel with curved bottom corners sitting on a teal strip. The giant
+   wordmark is cut in the same cream as the panel, so it reads as the panel's
+   own material showing through, and drifts slower than the page so it is
+   revealed from underneath as you reach the bottom.
+   ========================================================================== */
+
+.footer {
+  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
+
+  position: relative;
+  background-color: var(--c-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Panel
+   -------------------------------------------------------------------------- */
+
+.footer__panel {
+  position: relative;
+  z-index: 2;
+  padding: calc(96 * var(--u)) calc(56 * var(--u)) calc(56 * var(--u));
+  border-bottom-left-radius: calc(48 * var(--u));
+  border-bottom-right-radius: calc(48 * var(--u));
+  background-color: var(--c-bg);
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: 1fr repeat(3, calc(206 * var(--u)));
+  column-gap: calc(24 * var(--u));
+  row-gap: calc(96 * var(--u));
+  max-width: calc(1168 * var(--u));
+  margin-inline: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Lead - heading and call to action
+   -------------------------------------------------------------------------- */
+
+.footer__title {
+  font-family: var(--font-body);
+  font-weight: var(--fw-bold);
+  font-size: calc(42 * var(--u));
+  line-height: 1.2;
+  color: var(--c-text);
+}
+
+.footer__title em {
+  display: block;
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: var(--fw-bold);
+  font-size: calc(53 * var(--u));
+  color: var(--c-primary);
+}
+
+.footer__cta {
+  display: inline-block;
+  margin-top: calc(34 * var(--u));
+  padding: calc(13 * var(--u)) calc(34 * var(--u));
+  border-radius: calc(6 * var(--u));
+  background-color: var(--c-primary);
+  color: var(--c-bg);
+  font-weight: var(--fw-semibold);
+  font-size: calc(20 * var(--u));
+  line-height: 1;
+  letter-spacing: 0.01em;
+  transition: background-color 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+
+.footer__cta:hover {
+  background-color: #f2621a;
+  transform: translateY(calc(-2 * var(--u)));
+}
+
+/* --------------------------------------------------------------------------
+   Link columns
+   -------------------------------------------------------------------------- */
+
+.footer__col-title {
+  margin-bottom: calc(18 * var(--u));
+  font-size: calc(16 * var(--u));
+  color: rgb(43 28 18 / 0.45);
+}
+
+.footer__col li + li {
+  margin-top: calc(12 * var(--u));
+}
+
+.footer__col a {
+  font-size: calc(18 * var(--u));
+  color: rgb(43 28 18 / 0.85);
+  transition: color 0.2s var(--ease-out);
+}
+
+.footer__col a:hover {
+  color: var(--c-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Base - mark and small print, aligned to the first link column
+   -------------------------------------------------------------------------- */
+
+.footer__base {
+  grid-column: 2 / -1;
+}
+
+.footer__mark {
+  width: calc(44 * var(--u));
+  margin-bottom: calc(16 * var(--u));
+}
+
+.footer__legal {
+  font-size: calc(15 * var(--u));
+  line-height: 1.6;
+  color: rgb(43 28 18 / 0.5);
+}
+
+/* --------------------------------------------------------------------------
+   Wordmark strip
+   -------------------------------------------------------------------------- */
+
+/* Sized from the viewport rather than --u so the word always spans the width:
+   at a fixed size it overflowed and got clipped at both ends. The strip is
+   shorter than the type, so the letters are cut off along the bottom edge the
+   way the reference is cut by the foot of the page. */
+.footer__wordmark {
+  --word: 15.9vw;
+
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  height: calc(var(--word) * 0.8);
+}
+
+.footer__wordmark span {
+  display: block;
+  margin-top: calc(var(--word) * -0.138);   /* drop the cap space above the letters */
+  font-family: var(--font-body);
+  font-weight: var(--fw-bold);
+  font-size: var(--word);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--c-bg);
+  will-change: transform;
+}
