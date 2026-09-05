@@ -1,0 +1,194 @@
+/* ==========================================================================
+   HERO (v2 - redesign sandbox)
+   A copy of css/sections/hero.css, loaded only by hero-v2.html. Edit freely;
+   the live hero on index.html is untouched until this is promoted.
+   Measured against a 1280 x 832 Figma frame. Every length is written as its
+   design-pixel number multiplied by --u, so the numbers here match the design
+   one for one and the whole composition scales as a unit.
+   ========================================================================== */
+
+.hero {
+  /* One design pixel.
+     Driven by whichever axis is tighter so the composition always fits, with a
+     floor that keeps type readable on short laptops and a ceiling that stops it
+     inflating on large monitors. Equals exactly 1px at the 1280x832 design size. */
+  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
+
+  /* The deck's own unit. Size and spread must share one factor, or the cards
+     drift apart and gaps open between them. Driven by width so the band always
+     spans the viewport and the outer cards keep bleeding; never below --u, so a
+     tall window still gets the composition at its designed size. Equals 1px at
+     1280x832, so the design is reproduced exactly there. */
+  --ud: max(var(--u), calc(100vw / 1280));
+
+  /* Half-width of the fan, in the deck's own unit. */
+  --spread: calc(502 * var(--ud));
+
+  /* Height left over once the composition has hit its --u ceiling. Split above
+     and below the copy so a tall monitor doesn't open one dead band between the
+     button and the deck. Zero at the design size, so nothing shifts there. */
+  --surplus: max(0px, 100svh - 832 * var(--u));
+
+  /* How far the deck must slide down to keep clear of the copy.
+     On a short, wide window the deck (width-driven) outgrows the copy
+     (height-driven) and would ride up over the button. Pushing it down instead
+     crops the cards against the bottom edge, which reads as bleed rather than a
+     collision, and keeps the deck's internal spacing untouched.
+     571u = the button's baseline in the copy flow plus the 40px the design
+     leaves beneath it; 260.5ud = the centre card's top above the hero's bottom.
+     Resolves to 0px at 1280x832, so the design is untouched there. */
+  --deck-drop: max(0px, calc(571 * var(--u) + var(--surplus) / 2
+                             + 260.5 * var(--ud) - 100svh));
+
+  --card-radius: calc(12 * var(--ud));
+  --card-shadow: 0 calc(2 * var(--ud)) calc(6 * var(--ud)) rgb(43 28 18 / 0.28);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  overflow: hidden; /* the outer cards bleed past both edges */
+}
+
+/* --------------------------------------------------------------------------
+   Header - logo only for now, navbar comes later
+   -------------------------------------------------------------------------- */
+
+.site-header {
+  position: relative;
+  z-index: 2;
+  padding: calc(20 * var(--u)) calc(78 * var(--u)) 0;
+}
+
+.site-header__logo {
+  display: block;
+  width: calc(55 * var(--u));
+}
+
+/* --------------------------------------------------------------------------
+   Copy
+   -------------------------------------------------------------------------- */
+
+.hero__inner {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(var(--surplus) / 2);
+  text-align: center;
+}
+
+.hero__title {
+  /* Sized so the copy breaks into the three designed lines on its own, rather
+     than relying on hard <br>s that would fight the fluid scaling. */
+  max-width: calc(680 * var(--u));
+  margin: calc(62 * var(--u)) auto 0;
+  font-family: var(--font-body);
+  font-weight: var(--fw-semibold);
+  font-size: calc(65 * var(--u));
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--c-text);
+  text-wrap: initial; /* balance would override the designed line breaks */
+}
+
+.hero__title em {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: var(--fw-bold);
+  color: var(--c-primary);
+}
+
+.hero__subtitle {
+  /* Left-aligned block, centred on the page - not centred text. */
+  width: calc(275 * var(--u));
+  margin: calc(32 * var(--u)) auto 0;
+  font-size: calc(22 * var(--u));
+  line-height: 1.05;
+  letter-spacing: 0.05em;
+  text-align: left;
+  color: rgb(43 28 18 / 0.6);
+}
+
+.hero__actions {
+  margin-top: calc(51 * var(--u));
+}
+
+.hero__cta {
+  display: inline-block;
+  padding: calc(10 * var(--u)) calc(31.7 * var(--u));
+  border-radius: calc(5 * var(--u));
+  background-color: var(--c-primary);
+  color: var(--c-bg);
+  font-weight: var(--fw-semibold);
+  font-size: calc(25 * var(--u));
+  line-height: 1;
+  letter-spacing: 0.01em;
+  transition: background-color 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+
+.hero__cta:hover {
+  background-color: #f2621a;
+  transform: translateY(calc(-2 * var(--u)));
+}
+
+/* --------------------------------------------------------------------------
+   Card deck
+   Each card sits in a slot that owns its resting position, so GSAP is free to
+   own the card's own transform without fighting the layout.
+   The whole deck is laid out in --ud, one shared unit for both size and
+   spread, so neighbouring cards keep their designed overlap at every width.
+   -------------------------------------------------------------------------- */
+
+.hero__deck {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transform: translateY(var(--deck-drop));
+  pointer-events: none;
+}
+
+.hero__card-slot {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: calc(var(--w) * var(--ud));
+  height: calc(var(--h) * var(--ud));
+  transform: translate(-50%, 50%) translate(var(--x), calc(var(--cy) * var(--ud) * -1));
+}
+
+.hero__card {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--card-radius);
+  background-color: var(--card-color);
+  box-shadow: var(--card-shadow);
+  transform: rotate(var(--rot));
+  will-change: transform;
+}
+
+/* Back to front: outermost pair, then the next pair, then the flanking pair,
+   with the untilted centre card on top. */
+.hero__card-slot--0,
+.hero__card-slot--6 { z-index: 1; --w: 253; --h: 253; --cy: 168; }
+.hero__card-slot--1,
+.hero__card-slot--5 { z-index: 2; --w: 269; --h: 269; --cy: 160; }
+.hero__card-slot--2,
+.hero__card-slot--4 { z-index: 3; --w: 226; --h: 226; --cy: 139; }
+.hero__card-slot--3 { z-index: 4; --w: 272; --h: 248; --cy: 136.5; }
+
+/* Offsets as a fraction of the fan's half-width, so the whole deck widens
+   together rather than only stretching at the ends. */
+.hero__card-slot--0 { --x: calc(-1 * var(--spread)); }
+.hero__card-slot--1 { --x: calc(-0.6992 * var(--spread)); }
+.hero__card-slot--2 { --x: calc(-0.4741 * var(--spread)); }
+.hero__card-slot--3 { --x: 0px; }
+.hero__card-slot--4 { --x: calc(0.4741 * var(--spread)); }
+.hero__card-slot--5 { --x: calc(0.6992 * var(--spread)); }
+.hero__card-slot--6 { --x: calc(1 * var(--spread)); }
+
+.hero__card--0 { --rot: 16deg;    --card-color: rgb(14 124 110 / 0.82); }
+.hero__card--1 { --rot: 8.75deg;  --card-color: #0e7c6e; }
+.hero__card--2 { --rot: 3.5deg;   --card-color: #079e8b; }
+.hero__card--3 { --rot: 0deg;     --card-color: #097063; }
+.hero__card--4 { --rot: -3.5deg;  --card-color: #079e8b; }
+.hero__card--5 { --rot: -8.75deg; --card-color: #0e7c6e; }
+.hero__card--6 { --rot: -16deg;   --card-color: rgb(14 124 110 / 0.82); }

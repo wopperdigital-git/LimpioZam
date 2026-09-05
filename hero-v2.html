@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script>document.documentElement.classList.add('js');</script>
+
+  <title>Hero v2 &mdash; LimpioZam</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <!-- The v2 copy only. hero.css is deliberately not loaded here. -->
+  <link rel="stylesheet" href="css/sections/hero-v2.css" />
+
+  <style>
+    /* Sandbox only: a scroll runway so the hero's pinned exit can be driven,
+       and a marker for where the next section would begin. */
+    .sandbox-next {
+      display: grid;
+      place-items: center;
+      min-height: 100svh;
+      background-color: #efe9dc;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgb(43 28 18 / 0.4);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HERO v2 - edit this copy freely -->
+  <section class="hero" id="hero">
+
+    <header class="site-header">
+      <a class="site-header__logo" href="#hero" aria-label="LimpioZam Cleaning Services, back to top" data-anim>
+        <img src="assets/images/logo.png" alt="" width="512" height="512" />
+      </a>
+    </header>
+
+    <div class="hero__inner">
+      <h1 class="hero__title" data-anim>THE BEST <em>CLEANING</em> SERVICES IN ZAMBOANGA CITY</h1>
+
+      <p class="hero__subtitle" data-anim>Quality, reliability, and customer satisfaction are our priority.</p>
+
+      <div class="hero__actions" data-anim>
+        <a class="hero__cta" href="#contact">Contact Us</a>
+      </div>
+    </div>
+
+    <!-- Decorative stand-ins for photography still to be supplied. -->
+    <div class="hero__deck" aria-hidden="true" data-anim>
+      <div class="hero__card-slot hero__card-slot--0">
+        <div class="hero__card hero__card--0"></div>
+      </div>
+      <div class="hero__card-slot hero__card-slot--1">
+        <div class="hero__card hero__card--1"></div>
+      </div>
+      <div class="hero__card-slot hero__card-slot--2">
+        <div class="hero__card hero__card--2"></div>
+      </div>
+      <div class="hero__card-slot hero__card-slot--3">
+        <div class="hero__card hero__card--3"></div>
+      </div>
+      <div class="hero__card-slot hero__card-slot--4">
+        <div class="hero__card hero__card--4"></div>
+      </div>
+      <div class="hero__card-slot hero__card-slot--5">
+        <div class="hero__card hero__card--5"></div>
+      </div>
+      <div class="hero__card-slot hero__card-slot--6">
+        <div class="hero__card hero__card--6"></div>
+      </div>
+    </div>
+
+  </section>
+
+  <main>
+    <section class="sandbox-next">next section starts here</section>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js"></script>
+
+  <script type="module" src="js/main-hero-v2.js"></script>
+
+</body>
+</html>
