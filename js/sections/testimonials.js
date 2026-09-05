@@ -1,81 +1,82 @@
 /* ==========================================================================
    TESTIMONIALS
-   A deliberately quiet section: cards fade up as they arrive, nothing more.
-   The two long testimonials collapse to a pull-quote behind a Read more
-   control that animates the card's height rather than snapping it.
+   The section pins and every scroll step snaps to the next card in the deck.
+   Cards are stacked on top of one another; only the active one is visible, and
+   the deck's height is tweened between them so the stack grows and shrinks
+   with the testimonial rather than being boxed to the longest one.
    ========================================================================== */
 
-/** Swap between the pull-quote and the full text on one card. */
-function bindExpander(card) {
-  const button = card.querySelector('.testimonials__more');
-  const excerpt = card.querySelector('.testimonials__excerpt');
-  const full = card.querySelector('.testimonials__full');
-
-  if (!button || !excerpt || !full) return;
-
-  let open = false;
-  let busy = false;
-
-  button.addEventListener('click', () => {
-    if (busy) return;
-    busy = true;
-    open = !open;
-
-    button.setAttribute('aria-expanded', String(open));
-    button.textContent = open ? 'Read less' : 'Read more';
-
-    // Height has to be a number at both ends for the tween to interpolate, so
-    // auto is measured first and restored once the card has settled.
-    // scrollHeight rather than offsetHeight: when closing, the excerpt is
-    // already collapsed to 0, so offsetHeight would animate it 0 -> 0 and the
-    // text would snap back at the end instead of easing.
-    const excerptHeight = excerpt.scrollHeight;
-    const fullHeight = full.scrollHeight;
-
-    gsap.timeline({
-      defaults: { duration: 0.5, ease: 'power2.inOut' },
-      onComplete: () => {
-        // Back to auto so a resize can reflow the card normally.
-        gsap.set(full, { height: open ? 'auto' : 0 });
-        gsap.set(excerpt, { height: open ? 0 : 'auto' });
-        busy = false;
-        ScrollTrigger.refresh();
-      },
-    })
-      .to(excerpt, { height: open ? 0 : excerptHeight, autoAlpha: open ? 0 : 1 }, 0)
-      .to(full, { height: open ? fullHeight : 0, autoAlpha: open ? 1 : 0 }, 0);
-  });
-}
+/** Seconds for one card to hand over to the next. */
+const SWAP = 0.45;
 
 export function initTestimonials({ animate }) {
   const section = document.querySelector('.testimonials');
 
   if (!section) return;
 
+  const deck = section.querySelector('.deck__cards');
+  const cards = gsap.utils.toArray('.deck__card', section);
   const title = section.querySelector('.testimonials__title');
-  const cards = gsap.utils.toArray('.testimonials__card', section);
 
-  gsap.utils.toArray('.testimonials__card--expandable', section).forEach(bindExpander);
+  if (!deck || cards.length === 0) return;
 
-  if (!animate) return;
+  // Without motion the deck cannot be advanced, so show the cards as a plain
+  // stacked list rather than hiding four of them behind an inert deck.
+  if (!animate) {
+    gsap.set(cards, { position: 'relative', marginBottom: '2rem' });
+    return;
+  }
+
+  let current = 0;
+
+  /** The first card is in flow to give the deck a height; take it out now. */
+  gsap.set(cards, { position: 'absolute', autoAlpha: 0 });
+  gsap.set(cards[0], { autoAlpha: 1 });
+  gsap.set(deck, { height: cards[0].offsetHeight });
+
+  const show = (next) => {
+    if (next === current) return;
+
+    const outgoing = cards[current];
+    const incoming = cards[next];
+    const forward = next > current;
+
+    current = next;
+
+    gsap.timeline({ defaults: { duration: SWAP, ease: 'power2.inOut' } })
+      .to(outgoing, { autoAlpha: 0, y: forward ? -18 : 18, scale: 0.97 }, 0)
+      .fromTo(incoming,
+        { autoAlpha: 0, y: forward ? 22 : -22, scale: 0.97 },
+        { autoAlpha: 1, y: 0, scale: 1 }, 0)
+      // Height last so the peeking shapes below track the new card.
+      .to(deck, { height: incoming.offsetHeight }, 0);
+  };
+
+  ScrollTrigger.create({
+    trigger: section,
+    start: 'top top',
+    // Three quarters of a viewport per card: enough travel that a snap feels
+    // deliberate, without making five testimonials cost five screens of scroll.
+    end: () => '+=' + window.innerHeight * 0.75 * (cards.length - 1),
+    pin: true,
+    // Snapping to whole cards means a scroll always settles on something
+    // readable rather than halfway between two testimonials.
+    snap: {
+      snapTo: 1 / (cards.length - 1),
+      duration: { min: 0.2, max: 0.5 },
+      ease: 'power1.inOut',
+    },
+    invalidateOnRefresh: true,
+    onUpdate: (self) => {
+      show(Math.round(self.progress * (cards.length - 1)));
+    },
+  });
 
   gsap.from(title, {
     autoAlpha: 0,
     y: 24,
     duration: 1,
     ease: 'power2.out',
-    scrollTrigger: { trigger: section, start: 'top 78%' },
-  });
-
-  // Each card fades on its own trigger so the columns stay independent as the
-  // visitor scrolls, rather than firing as one block.
-  cards.forEach((card) => {
-    gsap.from(card, {
-      autoAlpha: 0,
-      y: 32,
-      duration: 1.1,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: card, start: 'top 88%' },
-    });
+    scrollTrigger: { trigger: section, start: 'top 75%' },
   });
 }

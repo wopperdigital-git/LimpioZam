@@ -1,27 +1,33 @@
 /* ==========================================================================
-   TESTIMONIALS - "Trusted by Homeowners and Businesses"
-   Three reflowing columns with staggered tops, so the layout keeps its
-   scattered feel whether cards are collapsed or expanded.
+   TESTIMONIALS
+   A deck of Facebook-style review cards. The section pins and each scroll step
+   snaps to the next card, so one testimonial holds the stage at a time and can
+   run full width rather than tall and narrow.
 
-   NOTE: the reference was a crop rather than a full-viewport frame, so sizes
-   are derived from proportions (the crop's content spans a symmetric 56px
-   margin, which is what dates it to a 1280 frame). Cards are new - the
-   reference shows plain text on the page background.
+   The two shapes below the deck are decorative, exactly as in the reference -
+   they carry no content, so cards are free to differ in height and the deck
+   still reads as a stack.
    ========================================================================== */
 
 .testimonials {
   --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
 
-  --pad-x: 56;
-  --col-gap: 40;
-  --card-pad: 26;
+  --card-w: 760;
+  --card-pad: 32;
+  --card-radius: calc(18 * var(--u));
   --card-bg: #fffdf8;
-  --card-shadow: 0 calc(2 * var(--u)) calc(3 * var(--u)) rgb(43 28 18 / 0.04),
-                 0 calc(10 * var(--u)) calc(28 * var(--u)) rgb(43 28 18 / 0.07);
 
   position: relative;
-  padding-block: calc(96 * var(--u)) calc(120 * var(--u));
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding-block: calc(60 * var(--u));
   background-color: var(--c-bg);
+  overflow: hidden;
+}
+
+.testimonials__inner {
+  width: 100%;
 }
 
 /* --------------------------------------------------------------------------
@@ -30,7 +36,7 @@
 
 .testimonials__title {
   max-width: calc(760 * var(--u));
-  margin: 0 auto calc(70 * var(--u));
+  margin: 0 auto calc(48 * var(--u));
   font-family: var(--font-body);
   font-weight: var(--fw-bold);
   font-size: calc(42 * var(--u));
@@ -49,93 +55,127 @@
 }
 
 /* --------------------------------------------------------------------------
-   Columns
+   Deck
    -------------------------------------------------------------------------- */
 
-.testimonials__grid {
+/* Cards differ in height, and the section centres its contents, so without a
+   fixed stage the heading would slide up and down as the deck swapped cards.
+   The stage holds the tallest card plus the peeking shapes, and the deck is
+   pinned to its top edge so cards always start just below the heading. */
+.testimonials__stage {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: calc(var(--col-gap) * var(--u));
-  align-items: start;
-  max-width: calc((1280 - 2 * var(--pad-x)) * var(--u));
-  margin-inline: auto;
-  padding-inline: calc(var(--pad-x) * var(--u));
-  box-sizing: content-box;
+  justify-items: center;
+  align-items: start;   /* fixed top edge, so the deck grows downward from it */
+  min-height: calc(560 * var(--u));
 }
 
-.testimonials__col {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--col-gap) * var(--u));
+.deck {
+  position: relative;
+  width: calc(var(--card-w) * var(--u));
 }
 
-/* The reference drops its middle group well below the outer two; keeping that
-   offset is what preserves the scattered feel once the columns reflow. */
-.testimonials__col--dropped {
-  margin-top: calc(185 * var(--u));
+/* Height is driven by whichever card is showing, and tweened between them, so
+   the deck grows and shrinks with the testimonial instead of being boxed to
+   the longest one. */
+.deck__cards {
+  position: relative;
+  z-index: 2;
+}
+
+/* Decorative stack peeking out below the front card. */
+.deck__peek {
+  position: absolute;
+  top: calc(100% - 30 * var(--u));
+  border-radius: var(--card-radius);
+  background-color: var(--card-bg);
+  pointer-events: none;
+}
+
+.deck__peek--1 {
+  z-index: 1;
+  left: calc(24 * var(--u));
+  right: calc(24 * var(--u));
+  height: calc(48 * var(--u));
+  box-shadow: 0 calc(6 * var(--u)) calc(14 * var(--u)) rgb(43 28 18 / 0.07);
+  filter: brightness(0.97);
+}
+
+.deck__peek--2 {
+  z-index: 0;
+  left: calc(50 * var(--u));
+  right: calc(50 * var(--u));
+  height: calc(66 * var(--u));
+  box-shadow: 0 calc(8 * var(--u)) calc(18 * var(--u)) rgb(43 28 18 / 0.07);
+  filter: brightness(0.94);
 }
 
 /* --------------------------------------------------------------------------
-   Cards
+   Card - Facebook post anatomy in the LimpioZam palette
    -------------------------------------------------------------------------- */
 
-.testimonials__card {
+.deck__card {
+  position: absolute;
+  inset: 0 0 auto 0;
   padding: calc(var(--card-pad) * var(--u));
-  border-radius: calc(14 * var(--u));
+  border-radius: var(--card-radius);
   background-color: var(--card-bg);
-  box-shadow: var(--card-shadow);
+  box-shadow: 0 calc(2 * var(--u)) calc(4 * var(--u)) rgb(43 28 18 / 0.05),
+              0 calc(14 * var(--u)) calc(34 * var(--u)) rgb(43 28 18 / 0.10);
 }
 
-.testimonials__name {
-  margin-bottom: calc(14 * var(--u));
-  font-family: var(--font-body);
-  font-style: italic;
-  font-weight: var(--fw-bold);
-  font-size: calc(21 * var(--u));
-  line-height: 1.2;
+/* The first card is in flow so the deck has a height before JS runs. */
+.deck__card:first-child {
+  position: relative;
+}
+
+.deck__head {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(14 * var(--u));
+  margin-bottom: calc(18 * var(--u));
+}
+
+.deck__avatar {
+  flex: none;
+  width: calc(48 * var(--u));
+  height: calc(48 * var(--u));
+  border-radius: 50%;
+  background-color: var(--c-secondary);
+}
+
+.deck__byline {
+  font-size: calc(19 * var(--u));
+  line-height: 1.35;
+  color: rgb(43 28 18 / 0.7);
+}
+
+.deck__byline strong {
+  font-weight: var(--fw-semibold);
   color: var(--c-text);
 }
 
-.testimonials__quote p {
+.deck__date {
+  display: flex;
+  align-items: center;
+  gap: calc(6 * var(--u));
+  margin-top: calc(3 * var(--u));
+  font-size: calc(16 * var(--u));
+  color: rgb(43 28 18 / 0.5);
+}
+
+.deck__date svg {
+  width: calc(13 * var(--u));
+  height: calc(13 * var(--u));
+  fill: currentColor;
+}
+
+.deck__body p {
   font-size: calc(19 * var(--u));
-  line-height: 1.45;
-  color: rgb(43 28 18 / 0.82);
+  line-height: 1.5;
+  color: rgb(43 28 18 / 0.85);
   text-wrap: wrap;
 }
 
-.testimonials__quote p + p {
+.deck__body p + p {
   margin-top: calc(14 * var(--u));
 }
-
-/* Collapsed pull-quote and the full text swap places; both are measured and
-   animated by height, so the card grows and shrinks smoothly. */
-.testimonials__full,
-.testimonials__excerpt {
-  overflow: hidden;   /* so the height tween clips instead of spilling text */
-}
-
-.js .testimonials__card--expandable .testimonials__full {
-  height: 0;
-  visibility: hidden;
-}
-
-.testimonials__more {
-  margin-top: calc(16 * var(--u));
-  padding: 0;
-  font-family: var(--font-body);
-  font-weight: var(--fw-semibold);
-  font-size: calc(17 * var(--u));
-  color: var(--c-primary);
-  border-bottom: 1px solid currentColor;
-  line-height: 1.4;
-  transition: opacity 0.25s var(--ease-out);
-}
-
-.testimonials__more:hover { opacity: 0.7; }
-
-/* Without JS there is nothing to expand, so show the full text and hide the
-   control rather than stranding the copy behind a dead button. */
-.testimonials__more { display: none; }
-.js .testimonials__more { display: inline-block; }
-.testimonials__card--expandable .testimonials__excerpt { display: none; }
-.js .testimonials__card--expandable .testimonials__excerpt { display: block; }
