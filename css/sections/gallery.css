@@ -1,0 +1,295 @@
+/* ==========================================================================
+   GALLERY
+   A mosaic of stills and clips on the same orange ground as section two, so
+   the two read as one continuous band of colour rather than as two sections
+   that happen to share a background.
+
+   The asymmetry is entirely in the spans: every tile sits on the same
+   12-column grid with the same gap, and no tile is nudged out of line. That is
+   what keeps it from drifting when --u changes - a collage of hand-placed
+   offsets would need re-tuning at every width, and this needs none.
+   ========================================================================== */
+
+.gallery {
+
+  /* -- design values, in the same 1280-wide frame as every other section -- */
+  --pad-x: 78;         /* section two's own --pad-x, so the two align exactly */
+  --grid-w: 1124;      /* the design frame less that margin on each side */
+  --grid-h: 690;       /* 6 rows of 100 plus 5 gaps of 18 */
+  --gap: 18;
+  --tile-radius: 12;   /* matches .reasons__card */
+
+  --title-size: 47;
+  --lead-size: 20.5;
+  --caption-size: 15;
+
+  position: relative;
+  /* The top figure is the band the fixed navbar occupies. Section two gets
+     away without one because it is pinned and centres its own contents; this
+     section is in the ordinary flow, so its first row would run under the bar. */
+  padding-block: calc(120 * var(--u)) calc(96 * var(--u));
+  /* The same figure section two indents its strip by, so the gallery's left
+     and right edges line up with the heading above it at every width. The
+     mosaic is fluid between these margins rather than a fixed 1124-wide band,
+     which is what used to leave it 124px inside section two on a 1920 screen. */
+  padding-inline: calc(var(--pad-x) * var(--u));
+  /* Exactly section two's ground, and for the same reason: the hero's stroke
+     ends on this value, section two wears it, and any drift here would draw a
+     seam across what should be one continuous colour. */
+  background-color: var(--c-primary);
+}
+
+.gallery__inner {
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Heading
+   Title left, lead right and bottom-aligned to it. Stacked it left most of a
+   1124-wide band empty; set across the band the header carries the same full
+   width the mosaic below it does.
+   -------------------------------------------------------------------------- */
+
+.gallery__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, calc(400 * var(--u)));
+  align-items: end;
+  gap: calc(40 * var(--u));
+  margin-bottom: calc(44 * var(--u));
+}
+
+.gallery__title {
+  font-family: var(--font-body);
+  font-weight: var(--fw-bold);
+  font-size: calc(var(--title-size) * var(--u));
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+
+/* Same trap as .reasons__title em: base.css paints every heading `em` in the
+   accent orange, which is this section's own ground. `inherit` is load-bearing
+   - dropping it falls back to base.css, not to the parent. */
+.gallery__title em {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-weight: var(--fw-bold);
+  color: inherit;
+}
+
+.gallery__lead {
+  /* --u bottoms out at 0.72 on a portrait tablet, where 20.5u lands at 14.8px.
+     The floor only bites below about 1100px wide; above it the design figure
+     is always the larger of the two and wins. */
+  font-size: max(16px, calc(var(--lead-size) * var(--u)));
+  line-height: 1.25;
+  color: rgb(255 255 255 / 0.9);   /* the hierarchy the design carries in opacity */
+}
+
+/* --------------------------------------------------------------------------
+   The mosaic
+   -------------------------------------------------------------------------- */
+
+.gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  /* Rows share a height derived from the width rather than measured in --u.
+     Now that the mosaic is fluid, fixed rows would keep their design height
+     while the columns stretched, and every tile would flatten out as the
+     window widened - a square tile on a 1280 screen was letterboxing by 1920.
+     Tied to the frame's own proportion, the mosaic keeps its shape at any
+     width. */
+  aspect-ratio: var(--grid-w) / var(--grid-h);
+  grid-template-rows: repeat(6, 1fr);
+  gap: calc(var(--gap) * var(--u));
+}
+
+.gallery__tile {
+  position: relative;
+  overflow: hidden;   /* the media is cropped to the tile, not the other way up */
+  border-radius: calc(var(--tile-radius) * var(--u));
+  /* Stands in for the split second before a still decodes, and for good after
+     a missing one - so a tile is never a white hole in the orange. */
+  background-color: var(--c-secondary);
+  transition: box-shadow 0.45s var(--ease-out);
+}
+
+/* The scrim, moved off the caption and onto the tile.
+   It belongs to the half that scales: a gradient can be stretched to any size
+   without ever looking stretched, so it rides the hover for free and always
+   covers the full width of the tile. Text on top of it cannot - which is why
+   the two are separate elements now. */
+.gallery__tile::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: calc(96 * var(--u));
+  /* Under the caption and the badge. A pseudo-element is generated as the
+     tile's LAST child, so with everything on z-index auto this gradient
+     painted over the label it exists to sit behind - which showed up as a
+     white caption gone muddy under 62% brown. */
+  z-index: 1;
+  pointer-events: none;
+  background-image: linear-gradient(to top,
+    rgb(43 28 18 / 0.62), rgb(43 28 18 / 0));
+  opacity: 0.88;
+  transition: opacity 0.45s var(--ease-out);
+}
+
+/* Deepened under the lifted tile, which grows out from under its own scrim. */
+.gallery__tile.is-lifted::after {
+  opacity: 1;
+}
+
+/* The tile under the pointer. Its scale is GSAP's - it already owns this
+   element's transform, and an inline transform beats any rule written here.
+   The depth cues are the part CSS can own outright.
+
+   The lift is what keeps the growth from reading as a rendering glitch: a tile
+   that grows on a flat plane looks like a layout jump, and the same tile with
+   a shadow under it looks like it came forward. */
+.gallery__tile.is-lifted {
+  z-index: 2;   /* over its neighbours, so the growth is never clipped by one */
+  box-shadow: 0 calc(16 * var(--u)) calc(38 * var(--u)) rgb(43 28 18 / 0.30);
+}
+
+/* base.css sets `height: auto` on every image and video to stop them
+   distorting. Here the tile owns the shape and the media fills it, so both are
+   overridden together with object-fit doing the cropping. */
+.gallery__tile img,
+.gallery__tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Placement, and the corner each tile grows out of.
+   Every tile is one line, so the mosaic can be re-cut by editing seven rows
+   rather than by moving markup around.
+
+   The origin is not decorative: a tile pins the edges it shares with the
+   mosaic's boundary and grows inward, away from them. The left column keeps
+   its left edge and opens rightward, the right column keeps its right edge and
+   opens leftward, the top row keeps its top edge and opens downward, and a
+   tile in the middle of a run opens both ways.
+
+   So every tile grows towards the middle and the mosaic's outer rectangle is
+   fixed - no tile ever crosses into the margin, and the block never appears to
+   breathe the way it did when everything scaled about its own centre. */
+.gallery__tile--a { grid-column: 1 / span 5;  grid-row: 1 / span 4; --ar: 1 / 1;   transform-origin:   0%   0%; }
+.gallery__tile--b { grid-column: 6 / span 3;  grid-row: 1 / span 2; --ar: 5 / 4;   transform-origin:  50%   0%; }
+.gallery__tile--c { grid-column: 6 / span 3;  grid-row: 3 / span 2; --ar: 5 / 4;   transform-origin:  50%  50%; }
+.gallery__tile--d { grid-column: 9 / span 4;  grid-row: 1 / span 3; --ar: 4 / 3;   transform-origin: 100%   0%; }
+.gallery__tile--e { grid-column: 9 / span 4;  grid-row: 4 / span 3; --ar: 4 / 3;   transform-origin: 100% 100%; }
+.gallery__tile--f { grid-column: 1 / span 3;  grid-row: 5 / span 2; --ar: 5 / 4;   transform-origin:   0% 100%; }
+.gallery__tile--g { grid-column: 4 / span 5;  grid-row: 5 / span 2; --ar: 21 / 10; transform-origin:  50% 100%; }
+
+/* --------------------------------------------------------------------------
+   Caption and play badge
+   -------------------------------------------------------------------------- */
+
+/* Text alone - the scrim behind it belongs to the tile now.
+   Anchored bottom-left, because that is the corner JS counter-scales it about:
+   the tile grows, this is scaled back by exactly the same factor, and the label
+   holds its size and its corner while the picture behind it opens out. Type
+   that changed size on hover is what read as broken, and it read worst on the
+   small tiles, where the caption is the largest share of the card. */
+.gallery__caption {
+  position: absolute;
+  inset: auto auto 0 0;
+  z-index: 2;   /* over the scrim - see the note on ::after above */
+  transform-origin: left bottom;
+  padding: calc(14 * var(--u)) calc(18 * var(--u));
+  /* Same floor, and this one needs it most: 15u is 10.8px once --u is on its
+     floor, which is not a readable caption on any device. */
+  font-size: max(13px, calc(var(--caption-size) * var(--u)));
+  font-weight: var(--fw-medium);
+  line-height: 1.2;
+  color: #fff;
+  pointer-events: none;
+}
+
+/* Counter-scaled with the caption, so the badge is one size on every tile
+   whatever the hover is doing. */
+.gallery__play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transition: opacity 0.45s var(--ease-out);
+}
+
+/* Once a clip is actually running the badge is a lie, so it goes. */
+.gallery__tile.is-playing .gallery__play {
+  opacity: 0;
+}
+
+.gallery__play span {
+  display: grid;
+  place-items: center;
+  width: calc(58 * var(--u));
+  height: calc(58 * var(--u));
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 0.92);
+  box-shadow: 0 calc(6 * var(--u)) calc(18 * var(--u)) rgb(43 28 18 / 0.25);
+}
+
+.gallery__play svg {
+  width: calc(20 * var(--u));
+  height: calc(20 * var(--u));
+  margin-left: calc(3 * var(--u));   /* optical centring: a triangle is not round */
+  fill: var(--c-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Phones
+   The 12-column mosaic is built on a 1124-wide band; at 390px every tile would
+   be a stripe. One column instead, with each tile keeping its own aspect so the
+   run still reads as varied rather than as seven identical rectangles.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .gallery {
+    /* 104u is the nav band section two clears on a phone; same bar, same figure. */
+    padding: calc(104 * var(--u)) calc(24 * var(--u)) calc(80 * var(--u));
+  }
+
+  .gallery__inner {
+    width: 100%;
+  }
+
+  .gallery__head {
+    display: block;
+    margin-bottom: calc(36 * var(--u));
+  }
+
+  .gallery__lead {
+    margin-top: calc(16 * var(--u));
+    font-size: calc(24 * var(--u));   /* 20.5u is 15px at --u's floor */
+  }
+
+  .gallery__grid {
+    grid-template-columns: 1fr;
+    /* One column of seven, so the frame's proportion and its six rows are both
+       meaningless here - and there is no hover on a touch device to need an
+       origin either. */
+    aspect-ratio: auto;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    gap: calc(20 * var(--u));
+  }
+
+  /* Spans are meaningless in one column, and a grid-row from the desktop
+     placement would leave four empty rows behind it. */
+  .gallery__tile {
+    grid-column: auto;
+    grid-row: auto;
+    aspect-ratio: var(--ar);
+  }
+
+  .gallery__caption {
+    font-size: calc(20 * var(--u));
+  }
+}

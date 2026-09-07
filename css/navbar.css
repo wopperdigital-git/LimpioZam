@@ -1,0 +1,190 @@
+/* ==========================================================================
+   NAVBAR
+   Fixed chrome. It lives outside the hero because the hero is pinned, and a
+   navbar inside it would be carried away the moment the pin engaged.
+
+   Two states. At the top of the page it has no ground at all, so it merges
+   into the hero. Past the first scroll it collects a glass panel, a radius and
+   a little clearance from the top edge, so it reads as floating over the page
+   rather than being part of it. Only the panel changes - the bar's layout is
+   identical in both, so nothing shifts under the reader.
+
+   A third treatment covers section two, which is a full bleed of the brand
+   orange; see the bottom of this file.
+   ========================================================================== */
+
+.navbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  padding: 0 calc(10 * var(--u));
+  /* The strip spans the window but is not itself a target - only the controls
+     are, or a transparent full-width box would swallow presses meant for the
+     page underneath. */
+  pointer-events: none;
+  transition: padding 0.32s var(--ease-out), opacity 0.25s linear;
+}
+
+.navbar__bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: calc(16 * var(--u));
+  max-width: calc(1180 * var(--u));
+  margin-inline: auto;
+  padding: calc(10 * var(--u)) calc(14 * var(--u));
+  /* Transparent to begin with, and carried in both states so switching it on
+     cannot shift the layout by its own width. */
+  border: 1px solid transparent;
+  border-radius: 0;
+  transition: background-color 0.32s var(--ease-out),
+              border-color 0.32s var(--ease-out),
+              border-radius 0.32s var(--ease-out),
+              box-shadow 0.32s var(--ease-out),
+              backdrop-filter 0.32s var(--ease-out);
+}
+
+.navbar__links a,
+.navbar__logo,
+.navbar__cta {
+  pointer-events: auto;
+}
+
+/* --------------------------------------------------------------------------
+   Scrolled - warm glass
+   -------------------------------------------------------------------------- */
+
+.navbar.is-scrolled {
+  padding: calc(12 * var(--u)) calc(24 * var(--u));
+}
+
+.navbar.is-scrolled .navbar__bar {
+  border-color: rgb(238 108 9 / 0.18);
+  border-radius: calc(22 * var(--u));
+  /* A wash rather than a colour: the tint is what makes it glass instead of a
+     panel, and the saturate is what stops the blur reading as grey. */
+  background-color: rgb(254 194 42 / 0.16);
+  -webkit-backdrop-filter: blur(calc(16 * var(--u))) saturate(1.5);
+  backdrop-filter: blur(calc(16 * var(--u))) saturate(1.5);
+  box-shadow: 0 calc(1 * var(--u)) calc(2 * var(--u)) rgb(43 28 18 / 0.05),
+              0 calc(8 * var(--u)) calc(24 * var(--u)) rgb(238 108 9 / 0.14);
+}
+
+/* --------------------------------------------------------------------------
+   Logo, then links, then the one call to action
+
+   Each zone is pinned to its own column. Auto-placement does the right thing
+   only while all three are present - hide the links on a narrow window and the
+   call to action slides into the middle `1fr` column and stretches across the
+   whole bar.
+   -------------------------------------------------------------------------- */
+
+.navbar__logo {
+  grid-column: 1;
+  display: block;
+  width: calc(46 * var(--u));
+}
+
+.navbar__links {
+  grid-column: 2;
+}
+
+.navbar__links ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(6 * var(--u));
+}
+
+.navbar__links a {
+  display: block;
+  padding: calc(9 * var(--u)) calc(16 * var(--u));
+  border-radius: 999px;
+  font-size: calc(15 * var(--u));
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--c-text);
+  transition: background-color 0.2s var(--ease-out), color 0.2s var(--ease-out);
+}
+
+/* No resting outline; the pill only appears under the pointer. */
+.navbar__links a:hover {
+  background-color: rgb(238 108 9 / 0.14);
+  color: var(--c-primary);
+}
+
+.navbar__cta {
+  grid-column: 3;
+  justify-self: end;
+  padding: calc(11 * var(--u)) calc(22 * var(--u));
+  /* Carried transparent so the outline the section-two state adds cannot
+     change the button's size as the bar crosses into it. */
+  border: calc(1.5 * var(--u)) solid transparent;
+  border-radius: 999px;
+  background-color: var(--c-primary);
+  color: var(--c-bg);
+  font-size: calc(15 * var(--u));
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 0.2s var(--ease-out), color 0.2s var(--ease-out),
+              border-color 0.2s var(--ease-out);
+}
+
+.navbar__cta:hover {
+  background-color: #d45f04;
+}
+
+/* --------------------------------------------------------------------------
+   Over section two
+   That section is a full bleed of the brand orange, and the bar's ordinary
+   colours are all but invisible on it. The whole thing flips to a white panel
+   with orange on it, driven by a class from js/navbar.js.
+
+   The panel is near-opaque rather than the faint wash it was: a white glass is
+   the point, and at this alpha the orange behind it only warms it. Orange ink
+   on that comes out at 2.9:1 - under the 3:1 floor, the same trade already
+   taken for this section's own white type.
+   -------------------------------------------------------------------------- */
+
+.navbar.is-over-orange .navbar__links a {
+  color: var(--c-primary);
+}
+
+/* No hover override: the bar's ordinary hover is an orange tint with orange
+   ink, which is exactly what a white panel wants. */
+
+.navbar.is-over-orange .navbar__cta {
+  background-color: #fff;
+  color: var(--c-primary);
+  /* Outlined, because the panel behind it is white too - an unbordered white
+     plate on this glass measures 1.1:1 and simply is not there. */
+  border-color: var(--c-primary);
+}
+
+.navbar.is-over-orange .navbar__cta:hover {
+  background-color: var(--c-primary);
+  color: #fff;
+}
+
+/* The mark is orange on transparent, which is what this panel wants - so the
+   white flattening a dark bar would need is deliberately absent. */
+
+.navbar.is-over-orange.is-scrolled .navbar__bar {
+  border-color: rgb(238 108 9 / 0.14);
+  background-color: rgb(255 255 255 / 0.92);
+  box-shadow: 0 calc(8 * var(--u)) calc(24 * var(--u)) rgb(43 28 18 / 0.10);
+}
+
+/* --------------------------------------------------------------------------
+   Narrow windows
+   The bar sheds from the middle outwards: the logo and the one action are the
+   parts that have to survive. Tablets keep the links; only phones lose them.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .navbar__links {
+    display: none;
+  }
+}

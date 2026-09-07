@@ -72,12 +72,26 @@ export function initFaq({ animate }) {
     scrollTrigger: { trigger: section, start: 'top 75%' },
   });
 
-  gsap.from(items, {
-    autoAlpha: 0,
+  /* Plain opacity here, not autoAlpha, and it matters for one reason: autoAlpha
+     sets visibility:hidden, and a hidden element is out of the tab order
+     completely. Every question in this list was therefore unreachable by
+     keyboard until the reveal had fired - tabbing down the page went straight
+     from the hero's button to the footer's and skipped the FAQ entirely. The
+     six buttons are the only scroll-revealed controls on the page, so this is
+     the only reveal that needs it. */
+  const reveal = gsap.from(items, {
+    opacity: 0,
     y: 26,
     duration: 0.7,
     stagger: 0.08,
     ease: 'power2.out',
     scrollTrigger: { trigger: section.querySelector('.faq__list'), start: 'top 85%' },
+  });
+
+  /* Focusing a question scrolls it into view, which fires the reveal anyway -
+     but a frame or two later. Finishing it here means focus never lands on a
+     control that is still transparent. */
+  section.addEventListener('focusin', () => {
+    if (reveal.progress() < 1) reveal.progress(1);
   });
 }

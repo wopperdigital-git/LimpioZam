@@ -1,15 +1,18 @@
 /* ==========================================================================
    FOOTER
-   A cream panel with curved bottom corners sitting on a teal strip. The giant
+   A cream panel with curved bottom corners sitting on a gold strip. The giant
    wordmark is cut in the same cream as the panel, so it reads as the panel's
    own material showing through, and drifts slower than the page so it is
    revealed from underneath as you reach the bottom.
    ========================================================================== */
 
 .footer {
-  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
 
   position: relative;
+  /* The wordmark's own bottom margin would collapse straight through - it is
+     the last child and there is no padding or border to stop it - and land the
+     space outside the gold strip. So the room below the word lives here. */
+  padding-bottom: calc(64 * var(--u));
   background-color: var(--c-secondary);
 }
 
@@ -20,7 +23,9 @@
 .footer__panel {
   position: relative;
   z-index: 2;
-  padding: calc(96 * var(--u)) calc(56 * var(--u)) calc(56 * var(--u));
+  /* 78u is section two's own --pad-x, so the footer's contents line up with
+     the heading in every section above it. */
+  padding: calc(96 * var(--u)) calc(78 * var(--u)) calc(56 * var(--u));
   border-bottom-left-radius: calc(48 * var(--u));
   border-bottom-right-radius: calc(48 * var(--u));
   background-color: var(--c-bg);
@@ -31,8 +36,9 @@
   grid-template-columns: 1fr repeat(3, calc(206 * var(--u)));
   column-gap: calc(24 * var(--u));
   row-gap: calc(96 * var(--u));
-  max-width: calc(1168 * var(--u));
-  margin-inline: auto;
+  /* No max-width and no auto margin: the panel's own padding is the margin
+     now, so a centred fixed-width band would sit inside it and pull the
+     contents off the line the sections above hold. */
 }
 
 /* --------------------------------------------------------------------------
@@ -42,7 +48,7 @@
 .footer__title {
   font-family: var(--font-body);
   font-weight: var(--fw-bold);
-  font-size: calc(42 * var(--u));
+  font-size: calc(48 * var(--u));
   line-height: 1.2;
   color: var(--c-text);
 }
@@ -52,7 +58,7 @@
   font-family: var(--font-accent);
   font-style: italic;
   font-weight: var(--fw-bold);
-  font-size: calc(53 * var(--u));
+  font-size: calc(60 * var(--u));
   color: var(--c-primary);
 }
 
@@ -71,7 +77,7 @@
 }
 
 .footer__cta:hover {
-  background-color: #f2621a;
+  background-color: #d45f04;
   transform: translateY(calc(-2 * var(--u)));
 }
 
@@ -82,7 +88,10 @@
 .footer__col-title {
   margin-bottom: calc(18 * var(--u));
   font-size: calc(16 * var(--u));
-  color: rgb(43 28 18 / 0.45);
+  /* 0.62 is where this ink clears 4.5:1 on the cream; at 0.45 it measured
+     2.78 and these labels were the least readable text on the page. Still
+     clearly subordinate to the 0.85 links under them. */
+  color: rgb(43 28 18 / 0.62);
 }
 
 .footer__col li + li {
@@ -100,22 +109,24 @@
 }
 
 /* --------------------------------------------------------------------------
-   Base - mark and small print, aligned to the first link column
+   Base - mark and small print, centred under everything
    -------------------------------------------------------------------------- */
 
 .footer__base {
-  grid-column: 2 / -1;
+  grid-column: 1 / -1;
+  text-align: center;
 }
 
+/* base.css makes every image a block, so the auto margins are what centre it. */
 .footer__mark {
   width: calc(44 * var(--u));
-  margin-bottom: calc(16 * var(--u));
+  margin: 0 auto calc(16 * var(--u));
 }
 
 .footer__legal {
   font-size: calc(15 * var(--u));
   line-height: 1.6;
-  color: rgb(43 28 18 / 0.5);
+  color: rgb(43 28 18 / 0.62);   /* 3.2:1 at 0.5; this clears 4.5 */
 }
 
 /* --------------------------------------------------------------------------
@@ -123,21 +134,38 @@
    -------------------------------------------------------------------------- */
 
 /* Sized from the viewport rather than --u so the word always spans the width:
-   at a fixed size it overflowed and got clipped at both ends. The strip is
-   shorter than the type, so the letters are cut off along the bottom edge the
-   way the reference is cut by the foot of the page. */
+   at a fixed size it overflowed and got clipped at both ends.
+
+   Nothing is clipped vertically either. The strip used to be 0.8x the type with
+   the span pulled up inside it, which cut 69px off the tops of the letters and
+   53px off the bottoms - the whole tail of the "p". Poppins' ascent and descent
+   come to 1.4em, so a `line-height: 1` box cannot hold the glyphs; the strip is
+   left at its natural line height with the overflow simply allowed to show. */
 .footer__wordmark {
   --word: 15.9vw;
 
-  position: relative;
-  z-index: 1;
-  overflow: hidden;
-  height: calc(var(--word) * 0.8);
+  /* The word does not move. It sticks to the viewport and the footer travels
+     over it: scrolling down slides the panel up and off, uncovering the word a
+     line at a time; scrolling up slides the panel back down over it. Nothing
+     here is animated, which is the point - a transform would move the word.
+
+     `bottom` is deliberately the footer's own bottom padding, so where sticky
+     holds it is exactly where it comes to rest at the end of the page and there
+     is no settle when it unsticks.
+
+     Sticky is clamped to its containing block, so before the footer is far
+     enough up the word rides at the footer's top - entirely behind the panel,
+     which is opaque and a layer above, so none of that shows. */
+  position: sticky;
+  bottom: calc(64 * var(--u));
+  z-index: 1;   /* under the panel, which is what covers and uncovers it */
+  /* Clears the panel above. Safe as a margin: a last child's bottom margin
+     escapes the footer, but a middle child's top margin does not. */
+  margin-top: calc(28 * var(--u));
 }
 
 .footer__wordmark span {
   display: block;
-  margin-top: calc(var(--word) * -0.138);   /* drop the cap space above the letters */
   font-family: var(--font-body);
   font-weight: var(--fw-bold);
   font-size: var(--word);
@@ -145,6 +173,29 @@
   letter-spacing: -0.01em;
   text-align: center;
   white-space: nowrap;
-  color: var(--c-bg);
-  will-change: transform;
+  /* Dark on the gold ground, not the page tone: a light word on this yellow is
+     1.6:1 and simply disappears, where the dark ink is 10:1. */
+  color: var(--c-text);
+}
+
+/* --------------------------------------------------------------------------
+   Phones
+   The panel's four columns come down to one; 1fr plus three 206u columns needs
+   445px before gaps, which no phone has.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .footer__panel {
+    /* 24u is section two's phone padding - same margin here as up there. */
+    padding: calc(80 * var(--u)) calc(24 * var(--u)) calc(48 * var(--u));
+  }
+
+  .footer__inner {
+    grid-template-columns: 1fr;
+    row-gap: calc(48 * var(--u));
+  }
+
+  .footer__base {
+    grid-column: auto;
+  }
 }

@@ -10,7 +10,6 @@
    ========================================================================== */
 
 .testimonials {
-  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
 
   --card-w: 760;
   --card-pad: 32;
@@ -21,12 +20,38 @@
   display: grid;
   place-items: center;
   min-height: 100svh;
-  padding-block: calc(60 * var(--u));
+  /* Top figure is the band the fixed navbar occupies - the heading arrives at
+     1.5x and ran under the bar by 50px without it. The bottom is trimmed to
+     match: the section is pinned, so anything past one screen is simply never
+     reachable, and with the band added it was running 51px over. */
+  padding-block: calc(88 * var(--u)) calc(24 * var(--u));
   background-color: var(--c-bg);
   overflow: hidden;
 }
 
+/* A field of dots, barely there - enough to give the section a surface for the
+   deck to sit on without reading as a pattern. Masked away at the top and
+   bottom edges: the sections either side are the same cream, so a hard-edged
+   field would draw a rectangle across an otherwise continuous ground. */
+.testimonials::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    rgb(43 28 18 / 0.07) calc(1.6 * var(--u)),
+    transparent calc(1.6 * var(--u)));
+  background-size: calc(24 * var(--u)) calc(24 * var(--u));
+  -webkit-mask-image: linear-gradient(to bottom,
+    transparent 0, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom,
+    transparent 0, #000 14%, #000 86%, transparent 100%);
+}
+
 .testimonials__inner {
+  position: relative;
+  z-index: 1;   /* over the dot field */
   width: 100%;
 }
 
@@ -35,8 +60,15 @@
    -------------------------------------------------------------------------- */
 
 .testimonials__title {
+  /* Scaled down from oversized as the section is scrolled. About its TOP edge,
+     not its centre: scaled about the centre it grew upward as well as down, and
+     at 1.5x that put it 14px under the fixed navbar. Anchored here the top edge
+     never moves and the extra height goes downward, into space the deck is not
+     using yet - the deck is at 0.16 opacity for the whole of that beat. */
+  transform-origin: 50% 0%;
+  will-change: transform;
   max-width: calc(760 * var(--u));
-  margin: 0 auto calc(48 * var(--u));
+  margin: 0 auto calc(34 * var(--u));
   font-family: var(--font-body);
   font-weight: var(--fw-bold);
   font-size: calc(42 * var(--u));
@@ -82,13 +114,15 @@
   z-index: 2;
 }
 
-/* Decorative stack peeking out below the front card. */
+/* Decorative stack peeking out below the front card. How many are showing is
+   driven in JS by how many cards are actually left to read. */
 .deck__peek {
   position: absolute;
   top: calc(100% - 30 * var(--u));
   border-radius: var(--card-radius);
   background-color: var(--card-bg);
   pointer-events: none;
+  will-change: transform, opacity;
 }
 
 .deck__peek--1 {
@@ -160,7 +194,7 @@
   gap: calc(6 * var(--u));
   margin-top: calc(3 * var(--u));
   font-size: calc(16 * var(--u));
-  color: rgb(43 28 18 / 0.5);
+  color: rgb(43 28 18 / 0.62);   /* 3.2:1 at 0.5; still under the 0.7 byline */
 }
 
 .deck__date svg {
@@ -178,4 +212,80 @@
 
 .deck__body p + p {
   margin-top: calc(14 * var(--u));
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   The deck is advanced by JS, and JS never runs for these visitors: main.js
+   builds every section inside a gsap.matchMedia keyed on
+   `(prefers-reduced-motion: no-preference)`, and matchMedia does not call the
+   callback at all when its query fails. So the module's own `!animate` branch
+   can never fire, and without this block four of the five cards stay stacked
+   underneath the first with only one readable. Laid out as a plain list here,
+   which also covers the page running with no JS at all.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .testimonials__stage {
+    min-height: 0;
+  }
+
+  .deck__card {
+    position: relative;
+  }
+
+  .deck__card + .deck__card {
+    margin-top: calc(24 * var(--u));
+  }
+
+  /* They stand for cards that are all on the page already. */
+  .deck__peek {
+    display: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Phones
+   The deck is 760 design pixels wide, which is 547px - wider than the window it
+   is in. Nothing is pinned here either, so the five reviews simply become a
+   list and the decorative stack underneath has nothing left to stand for.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .testimonials {
+    display: block;
+    min-height: 0;
+    padding: calc(104 * var(--u)) calc(20 * var(--u)) calc(72 * var(--u));
+  }
+
+  .testimonials__title {
+    font-size: calc(40 * var(--u));
+    margin-bottom: calc(36 * var(--u));
+  }
+
+  .testimonials__title em {
+    font-size: calc(50 * var(--u));
+  }
+
+  .testimonials__stage {
+    display: block;
+    min-height: 0;
+  }
+
+  .deck {
+    width: 100%;
+  }
+
+  .deck__card {
+    position: relative;
+    inset: auto;
+  }
+
+  .deck__card + .deck__card {
+    margin-top: calc(24 * var(--u));
+  }
+
+  .deck__peek {
+    display: none;
+  }
 }

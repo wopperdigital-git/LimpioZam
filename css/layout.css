@@ -14,6 +14,14 @@
   padding-block: 120px;
 }
 
+/* The navbar is fixed, so anything jumped to from it has to clear the bar.
+   The bar stands 82 design px tall including its top gutter, which is 59-94px
+   once --u's clamp is applied; these numbers are that plus air. */
+section[id],
+footer[id] {
+  scroll-margin-top: clamp(92px, 11vh, 140px);
+}
+
 /* --------------------------------------------------------------------------
    Image placeholder
    Stand-in for artwork not yet exported from Figma.

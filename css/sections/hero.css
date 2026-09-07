@@ -3,89 +3,56 @@
    Measured against a 1280 x 832 Figma frame. Every length is written as its
    design-pixel number multiplied by --u, so the numbers here match the design
    one for one and the whole composition scales as a unit.
+
+   The copy is centred and the card deck is gone. At rest the call to action
+   is only a button, standing on a floor of drifting suds. On scroll that same element
+   becomes the squeegee: it stretches into a full-width blade, grows a handle
+   proportioned to its new size, and pulls down the floor - clearing the suds
+   and leaving the next section's background behind it. Nothing is ever
+   duplicated on top of anything else, which is what keeps it in true at any
+   zoom.
    ========================================================================== */
 
 .hero {
-  /* One design pixel.
-     Driven by whichever axis is tighter so the composition always fits, with a
-     floor that keeps type readable on short laptops and a ceiling that stops it
-     inflating on large monitors. Equals exactly 1px at the 1280x832 design size. */
-  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
-
-  /* The deck's own unit. Size and spread must share one factor, or the cards
-     drift apart and gaps open between them. Driven by width so the band always
-     spans the viewport and the outer cards keep bleeding; never below --u, so a
-     tall window still gets the composition at its designed size. Equals 1px at
-     1280x832, so the design is reproduced exactly there. */
-  --ud: max(var(--u), calc(100vw / 1280));
-
-  /* Half-width of the fan, in the deck's own unit. */
-  --spread: calc(502 * var(--ud));
-
-  /* Height left over once the composition has hit its --u ceiling. Split above
-     and below the copy so a tall monitor doesn't open one dead band between the
-     button and the deck. Zero at the design size, so nothing shifts there. */
-  --surplus: max(0px, 100svh - 832 * var(--u));
-
-  /* How far the deck must slide down to keep clear of the copy.
-     On a short, wide window the deck (width-driven) outgrows the copy
-     (height-driven) and would ride up over the button. Pushing it down instead
-     crops the cards against the bottom edge, which reads as bleed rather than a
-     collision, and keeps the deck's internal spacing untouched.
-     571u = the button's baseline in the copy flow plus the 40px the design
-     leaves beneath it; 260.5ud = the centre card's top above the hero's bottom.
-     Resolves to 0px at 1280x832, so the design is untouched there. */
-  --deck-drop: max(0px, calc(571 * var(--u) + var(--surplus) / 2
-                             + 260.5 * var(--ud) - 100svh));
-
-  --card-radius: calc(12 * var(--ud));
-  --card-shadow: 0 calc(2 * var(--ud)) calc(6 * var(--ud)) rgb(43 28 18 / 0.28);
 
   position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  overflow: hidden; /* the outer cards bleed past both edges */
+  /* The header is fixed chrome now and no longer a child here, so its height is
+     reserved instead. `.hero__inner` centres itself with auto margins, and
+     without this it would centre in the whole section and sit lower than the
+     design has it. 20u of header padding plus a 55u mark. */
+  padding-top: calc(75 * var(--u));
+  overflow: hidden;
 }
 
 /* --------------------------------------------------------------------------
-   Header - logo only for now, navbar comes later
+   Copy - centred in the space left by the header
    -------------------------------------------------------------------------- */
 
-.site-header {
-  position: relative;
-  z-index: 2;
-  padding: calc(20 * var(--u)) calc(78 * var(--u)) 0;
-}
-
-.site-header__logo {
-  display: block;
-  width: calc(55 * var(--u));
-}
-
-/* --------------------------------------------------------------------------
-   Copy
-   -------------------------------------------------------------------------- */
-
+/* Deliberately no z-index: that would trap the copy and the button in one
+   stacking context, and the paint has to slide between them - over the title,
+   under the blade. Each child carries its own layer instead. */
 .hero__inner {
   position: relative;
-  z-index: 2;
-  margin-top: calc(var(--surplus) / 2);
+  margin-block: auto;
+  padding-bottom: calc(60 * var(--u));   /* optical centre, not mathematical */
   text-align: center;
 }
 
 .hero__title {
-  /* Sized so the copy breaks into the three designed lines on its own, rather
-     than relying on hard <br>s that would fight the fluid scaling. */
+  position: relative;
+  z-index: 3;   /* under the paint, so the stroke wipes it */
   max-width: calc(680 * var(--u));
-  margin: calc(62 * var(--u)) auto 0;
+  margin-inline: auto;
   font-family: var(--font-body);
   font-weight: var(--fw-semibold);
   font-size: calc(65 * var(--u));
   line-height: 1;
   letter-spacing: 0.01em;
   color: var(--c-text);
-  text-wrap: initial; /* balance would override the designed line breaks */
+  text-wrap: initial;
 }
 
 .hero__title em {
@@ -96,6 +63,8 @@
 }
 
 .hero__subtitle {
+  position: relative;
+  z-index: 3;   /* under the paint, so the stroke wipes it */
   /* Left-aligned block, centred on the page - not centred text. */
   width: calc(275 * var(--u));
   margin: calc(32 * var(--u)) auto 0;
@@ -103,16 +72,71 @@
   line-height: 1.05;
   letter-spacing: 0.05em;
   text-align: left;
-  color: rgb(43 28 18 / 0.6);
+  color: rgb(43 28 18 / 0.62);   /* 4.32:1 at 0.6, a hair under the 4.5 floor */
 }
 
+/* Flex rather than a text-aligned line box, so the row is exactly as tall as
+   the tool, so the handle can hang off its bottom edge at `top: 100%`.
+   Above the paint, because the button is the blade doing the painting. */
 .hero__actions {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
   margin-top: calc(51 * var(--u));
 }
 
+/* The tool. Only the wrapper travels, so the handle is welded to the blade by
+   construction rather than by animating the same distance onto both. Its own
+   box stays the button's size all the way through - the head is stretched with
+   a transform, which leaves layout alone - so the handle stays centred on the
+   screen without ever being measured. */
+.hero__tool {
+  position: relative;
+  display: flex;   /* not a block: a line box would add descender space below
+                      the button, and the handle hangs off `top: 100%` */
+}
+
+/* The handle. Hidden until the head stretches: at rest this is a button and
+   nothing else.
+
+   Proportioned against the blade's THICKNESS, not its length. A real squeegee's
+   handle runs about 63% of its head, but that head is roughly 12 times longer
+   than it is thick; ours spans the whole screen at 26 times, so 63% of length
+   would be a handle taller than the viewport. Against thickness the reference
+   works out at handle 8x, grip 1.8x, saddle 5x - which is what these numbers
+   are, and why the tool still reads as the same object at any width.
+
+   Centred by auto margins, deliberately not by translateX(-50%): GSAP bakes
+   whatever transform it finds into pixels when it takes over, and a -50% frozen
+   as px is correct at exactly one scale. The negative left/right give the auto
+   margins room to centre a box wider than the button it hangs from - without
+   them an over-wide absolute box gives up and aligns left. */
+.hero__handle {
+  position: absolute;
+  top: 100%;
+  left: -100%;
+  right: -100%;
+  display: block;
+  width: calc(250 * var(--u));
+  max-width: none;   /* the base reset caps svg at 100%, which would clamp the
+                        handle to the button's width and letterbox the drawing */
+  height: calc(408 * var(--u));
+  margin-inline: auto;
+  fill: #c9541a;
+  opacity: 0;
+}
+
+/* At rest this is a button and nothing more; the rubber along its bottom edge
+   reads as a button's own shadow until the moment it becomes a wiping edge. On
+   scroll this very element stretches to full width and makes the stroke - there
+   is no second blade to hand over to, and so nothing that can drift out of
+   register with it when the page is zoomed. */
 .hero__cta {
+  position: relative;
+  overflow: hidden;
   display: inline-block;
-  padding: calc(10 * var(--u)) calc(31.7 * var(--u));
+  padding: calc(10 * var(--u)) calc(31.7 * var(--u)) calc(14 * var(--u));
   border-radius: calc(5 * var(--u));
   background-color: var(--c-primary);
   color: var(--c-bg);
@@ -120,73 +144,108 @@
   font-size: calc(25 * var(--u));
   line-height: 1;
   letter-spacing: 0.01em;
-  transition: background-color 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+  transition: background-color 0.25s var(--ease-out);
 }
 
+/* Colour only. The lift this used to have was a transform, and the stretch
+   leaves an inline transform on this element that a stylesheet cannot beat. */
 .hero__cta:hover {
-  background-color: #f2621a;
-  transform: translateY(calc(-2 * var(--u)));
+  background-color: #d45f04;
+}
+
+.hero__cta::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 22%;   /* the rubber; thins with the head as it stretches */
+  background-color: #c9541a;
 }
 
 /* --------------------------------------------------------------------------
-   Card deck
-   Each card sits in a slot that owns its resting position, so GSAP is free to
-   own the card's own transform without fighting the layout.
-   The whole deck is laid out in --ud, one shared unit for both size and
-   spread, so neighbouring cards keep their designed overlap at every width.
+   Suds - the wet floor the squeegee is there to clear
+   Behind everything (z-index 1), so the copy reads over it and the stroke's
+   paint (z-index 4) covers it completely. Bubbles are built in JS, which is
+   also what keeps them out of a no-script page.
    -------------------------------------------------------------------------- */
 
-.hero__deck {
+.suds {
   position: absolute;
   inset: 0;
   z-index: 1;
-  transform: translateY(var(--deck-drop));
+  overflow: hidden;
   pointer-events: none;
 }
 
-.hero__card-slot {
+/* A film of water rather than a hard edge - the bubbles sit in it. */
+.suds::after {
+  content: '';
   position: absolute;
-  left: 50%;
-  bottom: 0;
-  width: calc(var(--w) * var(--ud));
-  height: calc(var(--h) * var(--ud));
-  transform: translate(-50%, 50%) translate(var(--x), calc(var(--cy) * var(--ud) * -1));
+  inset: 40% 0 0 0;
+  background: linear-gradient(to bottom,
+    rgb(238 108 9 / 0) 0%,
+    rgb(238 108 9 / 0.035) 55%,
+    rgb(238 108 9 / 0.07) 100%);
 }
 
-.hero__card {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--card-radius);
-  background-color: var(--card-color);
-  box-shadow: var(--card-shadow);
-  transform: rotate(var(--rot));
-  will-change: transform;
+/* Highlight up and left, thin warm rim, soft bloom along the lower edge: enough
+   to read as a soap bubble at 12px without competing with the headline. */
+.suds__bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 33% 29%,
+    rgb(255 255 255 / 0.95) 0%,
+    rgb(255 255 255 / 0.5) 36%,
+    rgb(255 255 255 / 0.08) 66%,
+    rgb(255 255 255 / 0) 78%);
+  box-shadow:
+    inset 0 0 0 1px rgb(238 108 9 / 0.18),
+    inset 0 calc(-2 * var(--u)) calc(7 * var(--u)) rgb(255 255 255 / 0.65);
+  will-change: transform, opacity;
 }
 
-/* Back to front: outermost pair, then the next pair, then the flanking pair,
-   with the untilted centre card on top. */
-.hero__card-slot--0,
-.hero__card-slot--6 { z-index: 1; --w: 253; --h: 253; --cy: 168; }
-.hero__card-slot--1,
-.hero__card-slot--5 { z-index: 2; --w: 269; --h: 269; --cy: 160; }
-.hero__card-slot--2,
-.hero__card-slot--4 { z-index: 3; --w: 226; --h: 226; --cy: 139; }
-.hero__card-slot--3 { z-index: 4; --w: 272; --h: 248; --cy: 136.5; }
+/* --------------------------------------------------------------------------
+   Squeegee - the paint only
+   What the stroke has already wiped over. Anchored to the top of the glass,
+   with its height driven in JS to the blade's own bottom edge. It sits between
+   the copy (z-index 3) and the button-blade (z-index 5), so it covers the
+   title, the subtitle and the logo on its way down while the blade stays in
+   front of it. Height is the only measurement in the whole effect.
+   -------------------------------------------------------------------------- */
 
-/* Offsets as a fraction of the fan's half-width, so the whole deck widens
-   together rather than only stretching at the ends. */
-.hero__card-slot--0 { --x: calc(-1 * var(--spread)); }
-.hero__card-slot--1 { --x: calc(-0.6992 * var(--spread)); }
-.hero__card-slot--2 { --x: calc(-0.4741 * var(--spread)); }
-.hero__card-slot--3 { --x: 0px; }
-.hero__card-slot--4 { --x: calc(0.4741 * var(--spread)); }
-.hero__card-slot--5 { --x: calc(0.6992 * var(--spread)); }
-.hero__card-slot--6 { --x: calc(1 * var(--spread)); }
+.squeegee {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
 
-.hero__card--0 { --rot: 16deg;    --card-color: rgb(14 124 110 / 0.82); }
-.hero__card--1 { --rot: 8.75deg;  --card-color: #0e7c6e; }
-.hero__card--2 { --rot: 3.5deg;   --card-color: #079e8b; }
-.hero__card--3 { --rot: 0deg;     --card-color: #097063; }
-.hero__card--4 { --rot: -3.5deg;  --card-color: #079e8b; }
-.hero__card--5 { --rot: -8.75deg; --card-color: #0e7c6e; }
-.hero__card--6 { --rot: -16deg;   --card-color: rgb(14 124 110 / 0.82); }
+/* Same colour as the next section, so the hand-off at the end of the pin is
+   seamless. Zero height until the stroke starts, so nothing shows at rest. */
+.squeegee__fill {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 0;
+  background-color: var(--c-primary);
+  will-change: height;
+}
+
+/* --------------------------------------------------------------------------
+   Phones
+   The squeegee stays - it is the signature moment and it works vertically.
+   Only the type comes down: 65u is 47px at --u's floor, which is a lot of
+   headline for a 360px window.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .hero__title {
+    max-width: none;
+    padding-inline: calc(20 * var(--u));
+    font-size: calc(48 * var(--u));
+  }
+
+  .hero__subtitle {
+    width: auto;
+    max-width: calc(320 * var(--u));
+    text-align: center;
+  }
+}

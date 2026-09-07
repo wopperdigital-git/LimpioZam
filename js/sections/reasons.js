@@ -6,7 +6,7 @@
    rather than by the scroller itself.
    ========================================================================== */
 
-export function initReasons({ animate }) {
+export function initReasons({ animate, phone }) {
   const section = document.querySelector('.reasons');
 
   if (!section) return;
@@ -19,6 +19,25 @@ export function initReasons({ animate }) {
   // Without motion the strip stays an ordinary horizontal scroller, which is
   // what the stylesheet already gives us.
   if (!animate) return;
+
+  /* On a phone the stylesheet has already turned the strip into a vertical
+     stack, so there is nothing to travel sideways and nothing to pin. Each
+     block just rises as it arrives, keyed off the page's own scroll. */
+  if (phone) {
+    gsap.from(intro.children, {
+      autoAlpha: 0, y: 24, duration: 0.6, stagger: 0.1,
+      scrollTrigger: { trigger: section, start: 'top 78%' },
+    });
+
+    items.forEach((item) => {
+      gsap.from([item.querySelector('.reasons__copy'), item.querySelector('.reasons__card')], {
+        autoAlpha: 0, y: 28, duration: 0.55, stagger: 0.1,
+        scrollTrigger: { trigger: item, start: 'top 85%' },
+      });
+    });
+
+    return;
+  }
 
   viewport.style.overflow = 'hidden';
 

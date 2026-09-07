@@ -11,7 +11,6 @@
    ========================================================================== */
 
 .reasons {
-  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
 
   /* -- design values, replace with exact Figma numbers when available -- */
   --pad-x: 78;         /* strip's leading and trailing margin */
@@ -32,7 +31,16 @@
   --desc-size: 17;
 
   position: relative;
-  background-color: var(--c-bg);
+  /* The colour the hero's squeegee spreads into, so the stroke carries straight
+     through: the wipe ends on this exact value and this section is already
+     wearing it when the pin releases.
+
+     The type on it is white by decision, not by calculation - white lands at
+     2.74:1 here, under both the 4.5:1 body floor and the 3:1 large-text one.
+     Dark brown would measure 5.99:1 if that trade is ever revisited; so would
+     keeping white and darkening this ground, but the ground has to stay exactly
+     the hero's paint or the hand-off shows a seam. */
+  background-color: var(--c-primary);
 }
 
 .reasons__viewport {
@@ -67,23 +75,27 @@
   font-size: calc(var(--title-size) * var(--u));
   line-height: 1.05;
   letter-spacing: 0.01em;
-  color: var(--c-text);
+  color: #fff;
 }
 
+/* Takes the heading's colour rather than the accent orange base.css gives every
+   `h2 em`: orange on orange is invisible. The emphasis is carried by the serif
+   italic alone. `inherit` is doing real work here - dropping the declaration
+   falls back to base.css, not to the parent. */
 .reasons__title em {
   display: block;
   font-family: var(--font-accent);
   font-style: italic;
   font-weight: var(--fw-bold);
   font-size: calc(var(--title-accent-size) * var(--u));
-  color: var(--c-primary);
+  color: inherit;
 }
 
 .reasons__lead {
   margin-top: calc(16 * var(--u));
   font-size: calc(var(--lead-size) * var(--u));
   line-height: 1.15;
-  color: rgb(43 28 18 / 0.75);
+  color: rgb(255 255 255 / 0.9);   /* the hierarchy the design used opacity for */
 }
 
 /* --------------------------------------------------------------------------
@@ -105,14 +117,14 @@
   font-family: var(--font-accent);
   font-size: calc(var(--num-size) * var(--u));
   line-height: 1;
-  color: var(--c-text);
+  color: #fff;
 }
 
 .reasons__desc {
   margin-top: calc(27 * var(--u));
   font-size: calc(var(--desc-size) * var(--u));
   line-height: 1.15;
-  color: rgb(43 28 18 / 0.75);
+  color: rgb(255 255 255 / 0.9);
 }
 
 .reasons__card {
@@ -120,5 +132,58 @@
   width: calc(var(--card-w) * var(--u));
   height: calc(var(--card-h) * var(--u));
   border-radius: calc(12 * var(--u));
-  background-color: #097063;
+  background-color: var(--c-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Phones
+   The sideways strip becomes an ordinary vertical stack. Nothing is pinned, so
+   the page scrolls the way a page should on a touch device.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .reasons {
+    padding: calc(104 * var(--u)) calc(24 * var(--u)) calc(72 * var(--u));
+  }
+
+  .reasons__viewport {
+    overflow: visible;
+  }
+
+  .reasons__strip {
+    display: block;
+    width: auto;
+    min-height: 0;
+    padding-inline: 0;
+  }
+
+  .reasons__intro {
+    width: auto;
+    margin-inline-end: 0;
+    margin-bottom: calc(64 * var(--u));
+  }
+
+  .reasons__item {
+    display: block;
+    margin-bottom: calc(64 * var(--u));
+  }
+
+  .reasons__item:last-child {
+    margin-bottom: 0;
+  }
+
+  .reasons__copy {
+    width: auto;
+  }
+
+  /* 17u is 12px at --u's floor - too small to read on a phone. */
+  .reasons__desc {
+    font-size: calc(22 * var(--u));
+  }
+
+  .reasons__card {
+    width: 100%;
+    height: calc(240 * var(--u));
+    margin-top: calc(28 * var(--u));
+  }
 }

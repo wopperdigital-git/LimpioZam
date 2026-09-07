@@ -6,33 +6,60 @@
    ========================================================================== */
 
 .services {
-  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.15px);
 
   --card-radius: calc(12 * var(--u));
   --card-shadow: 0 calc(6 * var(--u)) calc(16 * var(--u)) rgb(43 28 18 / 0.18);
-  /* Axis and ramp both fitted from the export by averaging three cards along
-     the gradient direction. The ramp is deliberately eased rather than linear:
-     the design holds orange through the first half before swinging to teal, so
-     a plain two-stop gradient came out far too green in the middle. */
+  /* Axis kept from the export; the ramp is now a warm one, deep orange through
+     amber to the golden yellow, so it reads as the reference's layered paper
+     rather than the orange-to-teal sweep it used to be. */
   --card-gradient: linear-gradient(
     249deg,
-    #e97817 0%,
-    #d58035 21%,
-    #c4884f 37%,
-    #ac9368 54%,
-    #7ca582 71%,
-    #49ba9d 88%,
-    #26c9b2 100%
+    #e05f05 0%,
+    #e96a09 21%,
+    #f0801c 37%,
+    #f29334 54%,
+    #f8a92e 71%,
+    #fdbd2b 88%,
+    #fec22a 100%
   );
-
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 100svh;
+  /* height, not min-height. The frame's layout box is a fixed 832 * --u tall,
+     so with the navbar's band reserved on top the section grew past the window
+     - and it is pinned, which put the bottom card 100px below the fold with no
+     way to scroll to it. Fixed to the window, the frame is scaled into what is
+     left and the whole composition is always on screen. */
+  height: 100svh;
   overflow: hidden;
+  /* Margin rather than padding for the gap to the sections either side. The
+     section clips its own overflow at exactly 100svh, which is what keeps the
+     shots cropped the way the composition wants; padding there would grow that
+     box and let more of them show. Margin adds the space without touching it. */
+  margin-block: calc(150 * var(--u));
+  /* The band the fixed navbar occupies. Reserved here rather than left to
+     chance: the composition is centred, and its topmost card sits 5px from the
+     frame's own top edge, so without this the bar covered 66px of it. The frame
+     is fitted to the content box, so reserving the space shrinks it to suit. */
+  padding-top: calc(96 * var(--u));
   background-color: var(--c-bg);
 }
 
+/* The design frame. Every card is laid out inside it, so nothing here should
+   ever be cut - but --u is derived from 100vw, which counts the scrollbar, and
+   below --u's 0.72 floor the frame stops shrinking while the window carries on.
+   Either way the frame ends up wider than the section that clips it, and the
+   grid start-aligns the overflow onto the right edge.
+
+   JS narrows this box's own --u until the frame fits whatever the section can
+   actually show, so the whole composition is always visible.
+
+   Its own unit rather than a transform on the box. A transform needs a known
+   origin, and there is none: an oversized grid item start-aligns instead of
+   centring, on both axes and only while oversized, so the same origin was right
+   in one window and 50px out in the next. Re-scaling the unit changes the
+   layout instead, which leaves the box the right size, properly centred, and
+   still measurable in frame coordinates for the orbit. */
 .services__stage {
   position: relative;
   width: calc(1280 * var(--u));
@@ -86,7 +113,7 @@
   height: calc(var(--h) * var(--u));
   left: calc(var(--x) * var(--u));
   top: calc(var(--y) * var(--u));
-  background-color: #097063;
+  background-color: var(--c-secondary);
 }
 
 .services__shot--1 { --x: 358;  --y: 24;  --w: 171; --h: 171; }
@@ -114,12 +141,26 @@
   will-change: transform, opacity;
 }
 
-.services__card--1 { --x: 112;  --y: 119; --w: 323; --h: 151; }
-.services__card--2 { --x: 600;  --y: 51;  --w: 323; --h: 182; }
-.services__card--3 { --x: 965;  --y: 299; --w: 293; --h: 177; }
-.services__card--4 { --x: 17;   --y: 373; --w: 257; --h: 207; }
-.services__card--5 { --x: 496;  --y: 609; --w: 293; --h: 177; }
-.services__card--6 { --x: 873;  --y: 581; --w: 318; --h: 177; }
+/* Centres pushed 14% further out from the heading and each canvas grown 8%,
+   both about the card's own centre so the ring stays balanced.
+
+   Then clamped, because the frame is smaller than the 1280 the rest of this
+   file assumes: --u comes from 100vw, which counts the scrollbar, and the grid
+   start-aligns the oversized stage rather than centring it, so the whole
+   overhang lands on the right. Below --u's 0.72 floor the stage stops shrinking
+   with the viewport and the loss grows fast - a 900px window only shows design-x
+   0..1229.
+
+   Rather than chase that per width, every card's TEXT box (inset 24px) is held
+   inside the original design's own extents, 41..1234. No window can then crop
+   this worse than it cropped the design it came from. It is why cards 3 and 6
+   grow but barely move: on the right there is simply no room left. */
+.services__card--1 { --x: 48;  --y: 81;  --w: 349; --h: 163; }
+.services__card--2 { --x: 604; --y: 5;   --w: 349; --h: 197; }
+.services__card--3 { --x: 942; --y: 287; --w: 316; --h: 191; }
+.services__card--4 { --x: 17;  --y: 372; --w: 278; --h: 224; }
+.services__card--5 { --x: 485; --y: 641; --w: 316; --h: 191; }
+.services__card--6 { --x: 915; --y: 609; --w: 343; --h: 191; }
 
 .services__card-title {
   font-family: var(--font-body);
@@ -141,7 +182,70 @@
 }
 
 /* Every other title fits on one line at the shared 24px padding, but this one
-   breaks after its hyphen in the export, so its text box is narrower. */
+   breaks after its hyphen in the export, so its text box is narrower. Held at
+   the original width even though the card around it grew: the type size did not
+   change, so this is the measure that forces the break, not a fraction of the
+   card. Scale it with the card and the title snaps back onto one line. */
 .services__card--3 .services__card-title {
   max-width: calc(232 * var(--u));
+}
+
+/* --------------------------------------------------------------------------
+   Phones
+   The orbit cannot survive here: fitting a 1280-wide frame into 360px took the
+   card text down to 5px. The frame is abandoned entirely and the cards become
+   one column at their own size. The image stand-ins go with it - they are
+   decorative, and there is no room to place them against anything.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .services {
+    display: block;
+    height: auto;
+    overflow: visible;
+    margin-block: calc(72 * var(--u));
+    padding: calc(104 * var(--u)) calc(24 * var(--u)) calc(72 * var(--u));
+  }
+
+  .services__stage {
+    width: auto;
+    height: auto;
+  }
+
+  .services__title {
+    position: static;
+    width: auto;
+    margin-bottom: calc(44 * var(--u));
+  }
+
+  .services__shot {
+    display: none;
+  }
+
+  .services__card {
+    position: static;
+    width: auto;
+    height: auto;
+    margin-bottom: calc(20 * var(--u));
+    padding: calc(26 * var(--u));
+  }
+
+  .services__card:last-of-type {
+    margin-bottom: 0;
+  }
+
+  /* Type sized for the window rather than for a frame that is no longer here. */
+  .services__card-title {
+    font-size: calc(30 * var(--u));
+  }
+
+  .services__card-text {
+    margin-top: calc(10 * var(--u));
+    font-size: calc(22 * var(--u));
+  }
+
+  /* The forced break existed to match a 293-wide card in the export. */
+  .services__card--3 .services__card-title {
+    max-width: none;
+  }
 }

@@ -5,12 +5,13 @@
    init function that receives whether it is allowed to animate.
    ========================================================================== */
 
+import { initNavbar } from './navbar.js';
 import { initHero } from './sections/hero.js';
 import { initReasons } from './sections/reasons.js';
+import { initGallery, initGalleryMedia } from './sections/gallery.js';
 import { initServices } from './sections/services.js';
 import { initTestimonials } from './sections/testimonials.js';
 import { initFaq } from './sections/faq.js';
-import { initFooter } from './sections/footer.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -52,23 +53,44 @@ function fontsReady(timeout = 3000) {
  * render its finished state directly in that case.
  */
 function initSections() {
-  gsap.matchMedia().add(
-    { animate: '(prefers-reduced-motion: no-preference)' },
-    (context) => {
-      const { animate } = context.conditions;
+  /* Two conditions, so matchMedia rebuilds every section when either flips -
+     including on a resize across the phone breakpoint, which is what lets the
+     pinned desktop builds and the plain mobile ones swap cleanly.
 
-      initHero({ animate });
-      initReasons({ animate });
-      initServices({ animate });
-      initTestimonials({ animate });
+     Note the callback runs if EITHER matches, so a phone with reduced motion
+     still calls in with `animate: false`; every section already returns early
+     on that. A desktop with reduced motion matches neither and is never called,
+     which is why each section's resting state has to be described in CSS. */
+  gsap.matchMedia().add(
+    {
+      animate: '(prefers-reduced-motion: no-preference)',
+      phone: '(max-width: 700px)',
+    },
+    (context) => {
+      const { animate, phone } = context.conditions;
+
+      initHero({ animate, phone });
+      initReasons({ animate, phone });
+      initGallery({ animate, phone });
+      initServices({ animate, phone });
+      initTestimonials({ animate, phone });
       initFaq({ animate });
-      initFooter({ animate });
     },
   );
 }
 
 async function init() {
   setGsapDefaults();
+
+  // Chrome, not a section: it runs outside the matchMedia so it exists for
+  // reduced-motion visitors too, whose sections are never built at all.
+  initNavbar();
+
+  // Chrome rather than animation, so it runs outside the matchMedia below -
+  // that never fires at all when the visitor has asked for reduced motion.
+  // The gallery's clips are the same case: left inside, a reduced-motion
+  // visitor would get video elements nothing can ever start.
+  initGalleryMedia();
 
   try {
     await fontsReady();

@@ -7,11 +7,13 @@
    -------------------------------------------------------------------------- */
 
 :root {
-  /* Brand colors */
+  /* Brand colors, sampled from the layered-paper reference: a warm ramp of
+     deep orange through amber to golden yellow on a near-white ground. No cool
+     tones at all - the teal that used to be --c-secondary is gone. */
   --c-text: #2b1c12;      /* default font color */
-  --c-primary: #ff712d;   /* emphasizer */
-  --c-secondary: #097063;
-  --c-bg: #f9f6ef;        /* page background */
+  --c-primary: #ee6c09;   /* deep orange - accents, actions, section two */
+  --c-secondary: #fec22a; /* golden yellow - the second ground */
+  --c-bg: #fbf9f4;        /* page background */
 
   /* Typography */
   --font-body: 'Poppins', system-ui, -apple-system, sans-serif;
@@ -28,6 +30,18 @@
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* One design pixel.
+     Driven by whichever axis is tighter so the composition always fits, with a
+     floor that keeps type readable on short laptops and a ceiling that stops it
+     inflating without limit. Equals exactly 1px at the 1280x832 design size.
+
+     Defined once, here. Every section used to carry an identical copy, which
+     made the ceiling seven edits instead of one - and the ceiling is the knob
+     that decides how much of a large monitor the design actually uses. At 1.15
+     it stopped growing at about 1470px wide, so a 1920 window was 41% design
+     and the rest margin; 1.4 carries it to the full height of a 1080 screen. */
+  --u: clamp(0.72px, min(100vw / 1280, 100svh / 832), 1.4px);
 }
 
 /* --------------------------------------------------------------------------

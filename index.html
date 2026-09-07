@@ -23,9 +23,11 @@
   <!-- Styles -->
   <link rel="stylesheet" href="css/base.css" />
   <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
   <!-- Section stylesheets are added here as each section is built -->
   <link rel="stylesheet" href="css/sections/hero.css" />
   <link rel="stylesheet" href="css/sections/reasons.css" />
+  <link rel="stylesheet" href="css/sections/gallery.css" />
   <link rel="stylesheet" href="css/sections/services.css" />
   <link rel="stylesheet" href="css/sections/testimonials.css" />
   <link rel="stylesheet" href="css/sections/faq.css" />
@@ -34,48 +36,66 @@
 
 <body>
 
+  <!-- Site chrome, deliberately outside the hero: the hero is pinned, and a
+       navbar inside it would be carried away with the pin. -->
+  <header class="navbar">
+    <div class="navbar__bar">
+
+      <a class="navbar__logo" href="#hero" aria-label="LimpioZam Cleaning Services, back to top">
+        <img src="assets/images/logo.png" alt="" width="512" height="512" />
+      </a>
+
+      <nav class="navbar__links" aria-label="Primary">
+        <ul>
+          <li><a href="#reasons">Why Us</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#testimonials">Reviews</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- TODO: confirm the real Messenger handle - this is the obvious guess
+           from the brand name and has not been verified. -->
+      <a class="navbar__cta" href="https://m.me/limpiozam"
+         target="_blank" rel="noopener noreferrer">Book Now</a>
+
+    </div>
+  </header>
+
   <!-- SECTION 1: Hero -->
   <section class="hero" id="hero">
 
-    <header class="site-header">
-      <a class="site-header__logo" href="#hero" aria-label="LimpioZam Cleaning Services, back to top" data-anim>
-        <img src="assets/images/logo.png" alt="" width="512" height="512" />
-      </a>
-    </header>
-
     <div class="hero__inner">
-      <h1 class="hero__title" data-anim>THE BEST <em>CLEANING</em> SERVICES IN ZAMBOANGA CITY</h1>
+      <h1 class="hero__title" data-anim>THE <em>BEST</em> CLEANING SERVICES IN ZAMBOANGA CITY</h1>
 
       <p class="hero__subtitle" data-anim>Quality, reliability, and customer satisfaction are our priority.</p>
 
       <div class="hero__actions" data-anim>
-        <a class="hero__cta" href="#contact">Contact Us</a>
+        <!-- The tool travels as one piece: the wrapper carries the stroke, the
+             button stretches inside it, and the handle hangs off it. Nothing
+             here animates the same distance twice. -->
+        <div class="hero__tool">
+          <a class="hero__cta" href="#contact"><span class="hero__cta__label">Contact Us</span></a>
+          <!-- Saddle, tapered grip, rounded cap - the three things that make a
+               squeegee read as a squeegee rather than as a T. -->
+          <svg class="hero__handle" viewBox="0 0 250 408" aria-hidden="true" focusable="false">
+            <rect x="0" y="-18" width="250" height="66" rx="24" />
+            <polygon points="94,32 156,32 169,364 81,364" />
+            <circle cx="125" cy="364" r="44" />
+          </svg>
+        </div>
       </div>
     </div>
 
-    <!-- Decorative stand-ins for photography still to be supplied. -->
-    <div class="hero__deck" aria-hidden="true" data-anim>
-      <div class="hero__card-slot hero__card-slot--0">
-        <div class="hero__card hero__card--0"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--1">
-        <div class="hero__card hero__card--1"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--2">
-        <div class="hero__card hero__card--2"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--3">
-        <div class="hero__card hero__card--3"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--4">
-        <div class="hero__card hero__card--4"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--5">
-        <div class="hero__card hero__card--5"></div>
-      </div>
-      <div class="hero__card-slot hero__card-slot--6">
-        <div class="hero__card hero__card--6"></div>
-      </div>
+    <!-- The wet floor. Filled in by JS so a no-script page stays clean. -->
+    <div class="suds" aria-hidden="true"></div>
+
+    <!-- Only the paint the stroke leaves behind. The button itself is the
+         blade, so there is no second copy of it to fall out of alignment. -->
+    <div class="squeegee" aria-hidden="true">
+      <div class="squeegee__fill"></div>
     </div>
 
   </section>
@@ -83,7 +103,7 @@
   <main>
 
     <!-- SECTION 2: What Makes Us Different -->
-    <section class="reasons" id="reasons">
+    <section class="reasons" id="reasons" data-ground="orange">
       <div class="reasons__viewport">
         <div class="reasons__strip">
 
@@ -121,7 +141,67 @@
       </div>
     </section>
 
-    <!-- SECTION 3: Services -->
+    <!-- SECTION 3: Gallery
+         Sits on section two's orange, unbroken, so the two read as one band of
+         colour. Every still and clip below is a placeholder on the brand
+         palette - swap the src, and nothing else here has to change. -->
+    <section class="gallery" id="gallery" data-ground="orange">
+      <div class="gallery__inner">
+
+        <div class="gallery__head">
+          <h2 class="gallery__title">A Look at <em>Our Work</em></h2>
+          <p class="gallery__lead">Deep cleaning homes and offices across Zamboanga City.</p>
+        </div>
+
+        <div class="gallery__grid">
+        <figure class="gallery__tile gallery__tile--a">
+          <video poster="assets/media/gallery/deep-clean.svg"
+                 muted loop playsinline preload="none"
+                 aria-label="Deep clean, start to finish"></video>
+          <span class="gallery__play" aria-hidden="true">
+            <span><svg viewBox="0 0 16 18" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <figcaption class="gallery__caption">Deep clean, start to finish</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--b">
+          <img src="assets/media/gallery/kitchen.svg" alt="Kitchen"
+               loading="lazy" decoding="async" />
+          <figcaption class="gallery__caption">Kitchen</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--c">
+          <img src="assets/media/gallery/bathroom.svg" alt="Bathroom tiles"
+               loading="lazy" decoding="async" />
+          <figcaption class="gallery__caption">Bathroom tiles</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--d">
+          <img src="assets/media/gallery/living-room.svg" alt="Living room reset"
+               loading="lazy" decoding="async" />
+          <figcaption class="gallery__caption">Living room reset</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--e">
+          <video poster="assets/media/gallery/glass-work.svg"
+                 muted loop playsinline preload="none"
+                 aria-label="Window &amp; glass work"></video>
+          <span class="gallery__play" aria-hidden="true">
+            <span><svg viewBox="0 0 16 18" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
+          </span>
+          <figcaption class="gallery__caption">Window &amp; glass work</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--f">
+          <img src="assets/media/gallery/crew.svg" alt="Our crew"
+               loading="lazy" decoding="async" />
+          <figcaption class="gallery__caption">Our crew</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--g">
+          <img src="assets/media/gallery/move-out.svg" alt="Move-out clean"
+               loading="lazy" decoding="async" />
+          <figcaption class="gallery__caption">Move-out clean</figcaption>
+        </figure>
+        </div>
+
+      </div>
+    </section>
+    <!-- SECTION 4: Services -->
     <section class="services" id="services">
       <div class="services__stage">
 
@@ -162,7 +242,7 @@
       </div>
     </section>
 
-    <!-- SECTION 4: Testimonials -->
+    <!-- SECTION 5: Testimonials -->
     <section class="testimonials" id="testimonials">
       <div class="testimonials__inner">
 
@@ -244,7 +324,7 @@
       </div>
     </section>
 
-    <!-- SECTION 5: FAQ -->
+    <!-- SECTION 6: FAQ -->
     <section class="faq" id="faq">
 
       <h2 class="faq__title"><em>Questions</em> We Hear Often</h2>
@@ -317,16 +397,21 @@
       <div class="footer__inner">
 
         <div class="footer__lead">
-          <h2 class="footer__title">Ready for a <em>proper clean?</em></h2>
+          <h2 class="footer__title">Ready for a <em>deep clean?</em></h2>
           <a class="footer__cta" href="#contact">Contact Us</a>
         </div>
 
           <div class="footer__col">
             <p class="footer__col-title">Company</p>
+            <!-- The same set the navbar carries, so the two ways of getting
+                 around the page never disagree. -->
             <ul>
-              <li><a href="#">About Us</a></li>
+              <li><a href="#reasons">Why Us</a></li>
+              <li><a href="#gallery">Gallery</a></li>
+              <li><a href="#services">Services</a></li>
+              <li><a href="#testimonials">Reviews</a></li>
+              <li><a href="#faq">FAQ</a></li>
               <li><a href="#contact">Contact</a></li>
-              <li><a href="#">Careers</a></li>
             </ul>
           </div>
           <div class="footer__col">
