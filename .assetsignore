@@ -1,0 +1,19 @@
+# Wrangler serves the repository ROOT as the site (assets.directory = "."), so
+# anything sitting next to index.html is uploaded and made public unless it is
+# named here. The first deploy published the entire .git directory - every
+# object, so the full source history - at /.git/... on the live origin.
+#
+# Do NOT add _headers or _redirects: Wrangler reads those as configuration and
+# already keeps them out of the served files.
+.git
+.gitignore
+.assetsignore
+
+# Wrangler's own build scratch and the generated config.
+.wrangler
+wrangler.jsonc
+wrangler.toml
+
+# Original photography, only ever local - gitignored, so it is absent from a CI
+# clone, but present if anyone ever deploys from their own machine.
+_source
