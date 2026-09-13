@@ -1,0 +1,21 @@
+# Cloudflare Pages reads this at deploy time and applies it to matching paths.
+# Order matters only in that the most specific block wins per header.
+
+/*
+  # The page is never framed by anyone, so clickjacking has nothing to work with.
+  X-Frame-Options: DENY
+  # Serve every file as the type it was declared, never as one it was sniffed to be.
+  X-Content-Type-Options: nosniff
+  # Full URL to our own pages, origin only to Messenger and Facebook.
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Nothing here asks for any of these, so nothing is granted them.
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+/assets/*
+  # Deliberately a day, not a year, and NOT immutable. Nothing here is
+  # content-hashed - the photography ships under stable names like
+  # our-crew.webp - so a long cache would pin a returning visitor to an old
+  # picture every time one is replaced in place, which is exactly how these
+  # files get updated. A day is long enough to spare repeat visitors the
+  # download and short enough that a swapped photo lands the next day.
+  Cache-Control: public, max-age=86400
