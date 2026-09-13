@@ -15,6 +15,15 @@ import { initFaq } from './sections/faq.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
+/* A mobile browser retracting its address bar fires a resize, and a resize
+   normally sends ScrollTrigger back round to remeasure every trigger. Doing
+   that mid-scroll re-pins the hero under the reader's finger, which reads as a
+   jump. The toolbar is not a real layout change, so it is ignored; a genuine
+   one - an orientation change, or a window actually being resized - still
+   refreshes. Pairs with the hero's `100lvh`, which is what makes the pin cover
+   the window in either toolbar state. */
+ScrollTrigger.config({ ignoreMobileResize: true });
+
 /**
  * Project-wide animation defaults, so individual tweens stay short.
  */
@@ -74,7 +83,6 @@ function initSections() {
       initGallery({ animate, phone });
       initServices({ animate, phone });
       initTestimonials({ animate, phone });
-      initFaq({ animate });
     },
   );
 }
@@ -94,6 +102,25 @@ async function init() {
 
   try {
     await fontsReady();
+
+    /* Outside the matchMedia, like the navbar and the clips, and for the same
+       reason: the accordion is a CONTROL, not decoration.
+
+       Left inside it, a desktop visitor who asks for reduced motion got a dead
+       FAQ. The callback only runs when one of its conditions matches, and that
+       visitor matches neither `no-preference` nor `max-width: 700px` - so the
+       click handlers were never attached, while `.js .faq__answer` had already
+       collapsed every answer to `height: 0; visibility: hidden`. Six questions,
+       no way to open any of them, and `aria-expanded="false"` telling a screen
+       reader the same.
+
+       initFaq wires its handlers before its own `!animate` guard, so passing
+       the query straight through gives every visitor a working accordion and
+       still skips the scroll reveals for this one. */
+    initFaq({
+      animate: window.matchMedia('(prefers-reduced-motion: no-preference)').matches,
+    });
+
     initSections();
   } finally {
     revealAnimatedElements();

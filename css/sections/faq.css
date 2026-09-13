@@ -86,16 +86,18 @@
   flex: none;
   display: grid;
   place-items: center;
+  /* The disc is gone, but the box stays: it is what the rotation turns about,
+     and at 38u it keeps a comfortable target around a 15u glyph. */
   width: calc(38 * var(--u));
   height: calc(38 * var(--u));
-  border-radius: 50%;
-  background-color: rgb(238 108 9 / 0.12);
   color: var(--c-primary);
-  transition: background-color 0.3s var(--ease-out);
+  /* Hover used to be carried by the disc going from 12% to 22%. With nothing
+     behind the glyph, the stroke itself has to darken instead. */
+  transition: color 0.3s var(--ease-out);
 }
 
 .faq__question:hover .faq__arrow {
-  background-color: rgb(238 108 9 / 0.22);
+  color: #d76208;
 }
 
 .faq__arrow svg {

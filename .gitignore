@@ -9,3 +9,6 @@ desktop.ini
 
 # Test artefacts
 .playwright-mcp/
+
+# Original photography, kept out of the deployed site
+_source/

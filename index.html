@@ -11,13 +11,13 @@
   <title>LimpioZam Cleaning Services</title>
   <meta name="description" content="Zamboanga City's trusted choice for professional deep cleaning services." />
 
-  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+  <link rel="icon" type="image/png" href="assets/images/favicon-64.png" />
 
   <!-- Fonts: Poppins (body + headings), PT Serif (emphasized headings) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Poppins:wght@400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;1,400;1,700&family=Poppins:wght@400;600;700&display=swap"
     rel="stylesheet" />
 
   <!-- Styles -->
@@ -36,16 +36,21 @@
 
 <body>
 
+  <!-- First stop for a keyboard or screen reader, so the six nav links and the
+       call to action are not a toll gate in front of the page. Visible only
+       once focused; see the rule in base.css. -->
+  <a class="skip-link" href="#main">Skip to content</a>
+
   <!-- Site chrome, deliberately outside the hero: the hero is pinned, and a
        navbar inside it would be carried away with the pin. -->
   <header class="navbar">
     <div class="navbar__bar">
 
       <a class="navbar__logo" href="#hero" aria-label="LimpioZam Cleaning Services, back to top">
-        <img src="assets/images/logo.png" alt="" width="512" height="512" />
+        <img src="assets/images/logo-128.webp" alt="" width="128" height="128" />
       </a>
 
-      <nav class="navbar__links" aria-label="Primary">
+      <nav class="navbar__links" id="navbar-menu" aria-label="Primary">
         <ul>
           <li><a href="#reasons">Why Us</a></li>
           <li><a href="#gallery">Gallery</a></li>
@@ -56,10 +61,18 @@
         </ul>
       </nav>
 
-      <!-- TODO: confirm the real Messenger handle - this is the obvious guess
-           from the brand name and has not been verified. -->
-      <a class="navbar__cta" href="https://m.me/limpiozam"
+      <a class="navbar__cta" href="https://www.messenger.com/t/656668470868627"
          target="_blank" rel="noopener noreferrer">Book Now</a>
+
+      <!-- Phones only. It opens the same <nav> above rather than a second copy
+           of the links, so the bar, the menu and the footer cannot drift apart.
+           aria-expanded is kept in step in navbar.js. -->
+      <button class="navbar__burger" type="button"
+              aria-label="Open menu" aria-expanded="false" aria-controls="navbar-menu">
+        <span class="navbar__burger-bars" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
 
     </div>
   </header>
@@ -100,10 +113,24 @@
 
   </section>
 
-  <main>
+  <main id="main" tabindex="-1">
 
     <!-- SECTION 2: What Makes Us Different -->
     <section class="reasons" id="reasons" data-ground="orange">
+      <!-- Background only: a diagonal field of gold waves, revealed and drifted by reasons.js. -->
+      <div class="reasons__waves" aria-hidden="true">
+        <div class="reasons__waves-drift">
+          <div class="reasons__waves-field">
+            <div class="reasons__wave"></div>
+            <div class="reasons__wave"></div>
+            <div class="reasons__wave"></div>
+            <div class="reasons__wave"></div>
+            <div class="reasons__wave"></div>
+            <div class="reasons__wave"></div>
+            <div class="reasons__wave"></div>
+          </div>
+        </div>
+      </div>
       <div class="reasons__viewport">
         <div class="reasons__strip">
 
@@ -117,24 +144,27 @@
             <p class="reasons__num">01</p>
             <p class="reasons__desc">Experienced, trained crews and proven cleaning methods.</p>
           </div>
-          <!-- Stand-in for photography still to be supplied. -->
-          <div class="reasons__card"></div>
+          <img class="reasons__card" src="assets/media/about/store-clean.webp"
+               alt="LimpioZam cleaners working through the display shelving of a retail store"
+               width="1000" height="796" loading="lazy" decoding="async" />
         </article>
         <article class="reasons__item">
           <div class="reasons__copy">
             <p class="reasons__num">02</p>
             <p class="reasons__desc">Affordable packages, with no compromise on quality.</p>
           </div>
-          <!-- Stand-in for photography still to be supplied. -->
-          <div class="reasons__card"></div>
+          <img class="reasons__card" src="assets/media/about/window-cleaning.webp"
+               alt="Two LimpioZam cleaners squeegeeing upper-floor windows from a scaffold"
+               width="1000" height="796" loading="lazy" decoding="async" />
         </article>
         <article class="reasons__item">
           <div class="reasons__copy">
             <p class="reasons__num">03</p>
             <p class="reasons__desc">Fresh, spotless spaces cared for down to the detail.</p>
           </div>
-          <!-- Stand-in for photography still to be supplied. -->
-          <div class="reasons__card"></div>
+          <img class="reasons__card" src="assets/media/about/kitchen-detail.webp"
+               alt="A LimpioZam cleaner wiping down a kitchen light fitting"
+               width="1000" height="796" loading="lazy" decoding="async" />
         </article>
 
         </div>
@@ -143,8 +173,10 @@
 
     <!-- SECTION 3: Gallery
          Sits on section two's orange, unbroken, so the two read as one band of
-         colour. Every still and clip below is a placeholder on the brand
-         palette - swap the src, and nothing else here has to change. -->
+         colour. The clips are silent 720p encodes of the phone originals kept
+         in _source/gallery, and the stills are exports from the same folder.
+         Tiles run in reading order, which is also the order they stack on a
+         phone. -->
     <section class="gallery" id="gallery" data-ground="orange">
       <div class="gallery__inner">
 
@@ -155,47 +187,46 @@
 
         <div class="gallery__grid">
         <figure class="gallery__tile gallery__tile--a">
-          <video poster="assets/media/gallery/deep-clean.svg"
+          <video src="assets/media/gallery/home-deep-clean.mp4"
+                 poster="assets/media/gallery/home-deep-clean.webp"
                  muted loop playsinline preload="none"
                  aria-label="Deep clean, start to finish"></video>
           <span class="gallery__play" aria-hidden="true">
             <span><svg viewBox="0 0 16 18" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
           </span>
-          <figcaption class="gallery__caption">Deep clean, start to finish</figcaption>
         </figure>
         <figure class="gallery__tile gallery__tile--b">
-          <img src="assets/media/gallery/kitchen.svg" alt="Kitchen"
+          <img src="assets/media/gallery/carpet-extraction.webp" alt="A LimpioZam cleaner running an extraction wand across office carpet"
                loading="lazy" decoding="async" />
-          <figcaption class="gallery__caption">Kitchen</figcaption>
         </figure>
         <figure class="gallery__tile gallery__tile--c">
-          <img src="assets/media/gallery/bathroom.svg" alt="Bathroom tiles"
+          <img src="assets/media/gallery/bathroom-detail.webp" alt="A LimpioZam cleaner scrubbing a bathtub beside a picture window"
                loading="lazy" decoding="async" />
-          <figcaption class="gallery__caption">Bathroom tiles</figcaption>
         </figure>
         <figure class="gallery__tile gallery__tile--d">
-          <img src="assets/media/gallery/living-room.svg" alt="Living room reset"
-               loading="lazy" decoding="async" />
-          <figcaption class="gallery__caption">Living room reset</figcaption>
-        </figure>
-        <figure class="gallery__tile gallery__tile--e">
-          <video poster="assets/media/gallery/glass-work.svg"
+          <video src="assets/media/gallery/upholstery-car-care.mp4"
+                 poster="assets/media/gallery/upholstery-car-care.webp"
                  muted loop playsinline preload="none"
-                 aria-label="Window &amp; glass work"></video>
+                 aria-label="Upholstery &amp; car interior care"></video>
           <span class="gallery__play" aria-hidden="true">
             <span><svg viewBox="0 0 16 18" focusable="false"><path d="M0 0l16 9-16 9z"/></svg></span>
           </span>
-          <figcaption class="gallery__caption">Window &amp; glass work</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--e">
+          <img src="assets/media/gallery/mattress-cleaning.webp" alt="A LimpioZam cleaner in gloves running an extraction tool across a mattress"
+               loading="lazy" decoding="async" />
         </figure>
         <figure class="gallery__tile gallery__tile--f">
-          <img src="assets/media/gallery/crew.svg" alt="Our crew"
+          <img src="assets/media/gallery/our-crew.webp" alt="Two LimpioZam cleaners working through the shelving of a retail store"
                loading="lazy" decoding="async" />
-          <figcaption class="gallery__caption">Our crew</figcaption>
         </figure>
         <figure class="gallery__tile gallery__tile--g">
-          <img src="assets/media/gallery/move-out.svg" alt="Move-out clean"
+          <img src="assets/media/gallery/upholstery-care.webp" alt="A LimpioZam cleaner deep-cleaning a fabric sofa with an extraction tool"
                loading="lazy" decoding="async" />
-          <figcaption class="gallery__caption">Move-out clean</figcaption>
+        </figure>
+        <figure class="gallery__tile gallery__tile--h">
+          <img src="assets/media/gallery/move-out-clean.webp" alt="A LimpioZam cleaner running a floor machine through an empty room"
+               loading="lazy" decoding="async" />
         </figure>
         </div>
 
@@ -209,10 +240,15 @@
           <em>Cleaning Services</em><span>Designed for You</span>
         </h2>
 
-        <!-- Stand-ins for photography still to be supplied. -->
-        <div class="services__shot services__shot--1"></div>
-        <div class="services__shot services__shot--2"></div>
-        <div class="services__shot services__shot--3"></div>
+        <img class="services__shot services__shot--1" src="assets/media/services/upholstery-tool.webp"
+             alt="A LimpioZam cleaner running an extraction tool over a velvet sofa"
+             width="750" height="750" loading="lazy" decoding="async" />
+        <img class="services__shot services__shot--2" src="assets/media/services/window-wipe.webp"
+             alt="A LimpioZam cleaner wiping down a window pane"
+             width="750" height="750" loading="lazy" decoding="async" />
+        <img class="services__shot services__shot--3" src="assets/media/services/high-fixtures.webp"
+             alt="A LimpioZam cleaner cleaning a ring light fitting from a scaffold"
+             width="750" height="750" loading="lazy" decoding="async" />
 
         <article class="services__card services__card--1">
           <h3 class="services__card-title">House Deep Cleaning</h3>
@@ -398,13 +434,67 @@
 
         <div class="footer__lead">
           <h2 class="footer__title">Ready for a <em>deep clean?</em></h2>
-          <a class="footer__cta" href="#contact">Contact Us</a>
+          <!-- Messenger, not "#contact": this panel *is* #contact, so the old
+               link sent you to the place you were already standing. -->
+          <a class="footer__cta" href="https://www.messenger.com/t/656668470868627"
+             target="_blank" rel="noopener noreferrer">Contact Us</a>
         </div>
 
-          <div class="footer__col">
-            <p class="footer__col-title">Company</p>
-            <!-- The same set the navbar carries, so the two ways of getting
-                 around the page never disagree. -->
+        <!-- The real channels, and the only place on the page that carries the
+             phone number and the address to write to. Sits beside the lead
+             rather than under it: the lead is capped at 560u, so the top row
+             had the room going spare. -->
+        <address class="footer__contact">
+          <p class="footer__contact-title">Contact info</p>
+          <ul>
+            <li>
+              <span class="footer__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              </span>
+              <!-- Dialled as +63 with the trunk 0 dropped, shown the way it is
+                   written locally. -->
+              <a href="tel:+639657058669">0965 705 8669</a>
+            </li>
+            <li>
+              <span class="footer__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+              </span>
+              <a href="mailto:limpiozam@gmail.com">limpiozam@gmail.com</a>
+            </li>
+            <li>
+              <span class="footer__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.19 5.44 3.14 7.17.16.15.26.35.27.57l.05 1.78c.02.57.6.94 1.12.71l1.99-.88c.17-.07.36-.09.54-.04 1.21.33 2.5.49 3.89.49 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm6 7.46l-2.94 4.66c-.47.74-1.47.93-2.18.4l-2.34-1.75a.6.6 0 0 0-.72 0l-3.16 2.4c-.42.32-.97-.18-.68-.63l2.94-4.66c.47-.74 1.47-.93 2.18-.4l2.34 1.75a.6.6 0 0 0 .72 0l3.16-2.4c.42-.32.97.18.68.63z"/></svg>
+              </span>
+              <a href="https://www.messenger.com/t/656668470868627" target="_blank" rel="noopener noreferrer">Chat on Messenger</a>
+            </li>
+            <li>
+              <span class="footer__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94z"/></svg>
+              </span>
+              <a href="https://www.facebook.com/profile.php?id=61576775381742" target="_blank" rel="noopener noreferrer">LimpioZam Cleaning Services</a>
+            </li>
+          </ul>
+        </address>
+
+        <!-- One band on a hairline, not a tall column at the far right. With
+             Socials and Legal gone there was only one list left, and a single
+             206u column against a 1fr lead left 837px of empty cream down the
+             middle of the panel. Laid out as a row, the remaining content
+             spans the full width, so both edges still line up with the
+             sections above. -->
+        <div class="footer__base">
+
+          <div class="footer__identity">
+            <img class="footer__mark" src="assets/images/logo-128.webp" alt="" width="128" height="128" />
+            <p class="footer__legal">
+              &copy; 2026 LimpioZam Cleaning Services. All rights reserved.<br />
+              Made in Zamboanga City, PH.
+            </p>
+          </div>
+
+          <!-- The same set the navbar carries, so the two ways of getting
+               around the page never disagree. -->
+          <nav class="footer__nav" aria-label="Footer">
             <ul>
               <li><a href="#reasons">Why Us</a></li>
               <li><a href="#gallery">Gallery</a></li>
@@ -413,29 +503,8 @@
               <li><a href="#faq">FAQ</a></li>
               <li><a href="#contact">Contact</a></li>
             </ul>
-          </div>
-          <div class="footer__col">
-            <p class="footer__col-title">Socials</p>
-            <ul>
-              <li><a href="#">Facebook</a></li>
-              <li><a href="#">Instagram</a></li>
-              <li><a href="#">TikTok</a></li>
-            </ul>
-          </div>
-          <div class="footer__col">
-            <p class="footer__col-title">Legal</p>
-            <ul>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms of Service</a></li>
-            </ul>
-          </div>
+          </nav>
 
-        <div class="footer__base">
-          <img class="footer__mark" src="assets/images/logo.png" alt="" width="512" height="512" />
-          <p class="footer__legal">
-            &copy; 2026 LimpioZam Cleaning Services. All rights reserved.<br />
-            Made in Zamboanga City, PH.
-          </p>
         </div>
 
       </div>

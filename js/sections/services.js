@@ -35,9 +35,9 @@ const FIT_MARGIN = 0.99;
 const PIN_VH = 1.5;
 
 /** Orbit centre, in design pixels within the stage - the heading's middle. */
-const PIVOT = { x: 637, y: 420 };
+const PIVOT = { x: 720, y: 420 };
 
-const DESIGN = { w: 1280, h: 832 };
+const DESIGN = { w: 1440, h: 832 };
 
 export function initServices({ animate, phone }) {
   const section = document.querySelector('.services');

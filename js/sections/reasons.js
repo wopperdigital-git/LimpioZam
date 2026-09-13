@@ -20,6 +20,21 @@ export function initReasons({ animate, phone }) {
   // what the stylesheet already gives us.
   if (!animate) return;
 
+  /* The waves arrive with the section: each band slides in along its own
+     diagonal and fades up, one after another. Keyed off the page's scroll on
+     both layouts, so a phone gets the same entrance as a desktop. From-values
+     only - the stylesheet describes the finished field, which is exactly what
+     a reduced-motion visitor sees. The slide is the 0.3 of the section's width
+     that the field's oversizing in reasons.css was measured against. */
+  gsap.from(gsap.utils.toArray('.reasons__wave', section), {
+    autoAlpha: 0,
+    x: () => -0.3 * section.offsetWidth,
+    duration: 1.6,
+    ease: 'power2.out',
+    stagger: 0.12,
+    scrollTrigger: { trigger: section, start: phone ? 'top 75%' : 'top 60%' },
+  });
+
   /* On a phone the stylesheet has already turned the strip into a vertical
      stack, so there is nothing to travel sideways and nothing to pin. Each
      block just rises as it arrives, keyed off the page's own scroll. */
@@ -54,6 +69,24 @@ export function initReasons({ animate, phone }) {
       start: 'top top',
       end: () => '+=' + travel(),
       pin: true,
+      scrub: 0.6,
+      invalidateOnRefresh: true,
+    },
+  });
+
+  /* The wave field drifts the same way as the strip at under a third of its
+     speed, so it reads as a layer behind it rather than as part of it. Its own
+     trigger over exactly the pinned range rather than a part of `slide`: the
+     items key off that tween through containerAnimation, which wants the strip
+     alone. Nothing to size - the field is oversized in CSS, so the only thing
+     set here is `x`, and gsap.matchMedia reverts that when a phone takes over. */
+  gsap.to(section.querySelector('.reasons__waves-drift'), {
+    x: () => -travel() * 0.3,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: section,
+      start: 'top top',
+      end: () => '+=' + travel(),
       scrub: 0.6,
       invalidateOnRefresh: true,
     },

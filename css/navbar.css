@@ -26,6 +26,10 @@
 }
 
 .navbar__bar {
+  /* The phone menu hangs off the bottom of this box, so it is the containing
+     block rather than `.navbar`, whose own padding would put the panel's edges
+     a few pixels wide of the bar's. */
+  position: relative;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -46,7 +50,8 @@
 
 .navbar__links a,
 .navbar__logo,
-.navbar__cta {
+.navbar__cta,
+.navbar__burger {
   pointer-events: auto;
 }
 
@@ -59,15 +64,15 @@
 }
 
 .navbar.is-scrolled .navbar__bar {
-  border-color: rgb(238 108 9 / 0.18);
+  border-color: rgb(242 110 9 / 0.18);
   border-radius: calc(22 * var(--u));
   /* A wash rather than a colour: the tint is what makes it glass instead of a
      panel, and the saturate is what stops the blur reading as grey. */
-  background-color: rgb(254 194 42 / 0.16);
+  background-color: rgb(255 196 42 / 0.16);
   -webkit-backdrop-filter: blur(calc(16 * var(--u))) saturate(1.5);
   backdrop-filter: blur(calc(16 * var(--u))) saturate(1.5);
   box-shadow: 0 calc(1 * var(--u)) calc(2 * var(--u)) rgb(43 28 18 / 0.05),
-              0 calc(8 * var(--u)) calc(24 * var(--u)) rgb(238 108 9 / 0.14);
+              0 calc(8 * var(--u)) calc(24 * var(--u)) rgb(242 110 9 / 0.14);
 }
 
 /* --------------------------------------------------------------------------
@@ -110,7 +115,7 @@
 
 /* No resting outline; the pill only appears under the pointer. */
 .navbar__links a:hover {
-  background-color: rgb(238 108 9 / 0.14);
+  background-color: rgb(242 110 9 / 0.14);
   color: var(--c-primary);
 }
 
@@ -133,7 +138,66 @@
 }
 
 .navbar__cta:hover {
-  background-color: #d45f04;
+  background-color: #d76208;
+}
+
+/* --------------------------------------------------------------------------
+   Burger
+   Phones only - the fourth zone in the bar, after the call to action. Hidden
+   everywhere else, where the links themselves are in the bar.
+   -------------------------------------------------------------------------- */
+
+.navbar__burger {
+  grid-column: 4;
+  display: none;
+  place-items: center;
+  width: calc(42 * var(--u));
+  height: calc(42 * var(--u));
+  border: 1px solid rgb(242 110 9 / 0.22);
+  border-radius: calc(12 * var(--u));
+  background-color: transparent;
+  color: var(--c-primary);
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+
+.navbar__burger:hover {
+  background-color: rgb(242 110 9 / 0.12);
+}
+
+.navbar__burger-bars {
+  position: relative;
+  display: block;
+  width: calc(18 * var(--u));
+  height: calc(12 * var(--u));
+}
+
+/* Absolute, so the three bars can cross without moving each other: the middle
+   one goes out and the outer two meet in the centre as an X. */
+.navbar__burger-bars span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: block;
+  height: calc(2 * var(--u));
+  border-radius: 999px;
+  background-color: currentColor;
+  transition: transform 0.24s var(--ease-out), opacity 0.16s linear;
+}
+
+.navbar__burger-bars span:nth-child(1) { top: 0; }
+.navbar__burger-bars span:nth-child(2) { top: calc(5 * var(--u)); }
+.navbar__burger-bars span:nth-child(3) { bottom: 0; }
+
+.navbar.is-menu-open .navbar__burger-bars span:nth-child(1) {
+  transform: translateY(calc(5 * var(--u))) rotate(45deg);
+}
+
+.navbar.is-menu-open .navbar__burger-bars span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar.is-menu-open .navbar__burger-bars span:nth-child(3) {
+  transform: translateY(calc(-5 * var(--u))) rotate(-45deg);
 }
 
 /* --------------------------------------------------------------------------
@@ -144,8 +208,8 @@
 
    The panel is near-opaque rather than the faint wash it was: a white glass is
    the point, and at this alpha the orange behind it only warms it. Orange ink
-   on that comes out at 2.9:1 - under the 3:1 floor, the same trade already
-   taken for this section's own white type.
+   on that comes out at 2.75:1 - a little under the 3:1 floor, which this
+   section's own white type, at 3.00:1, now just meets.
    -------------------------------------------------------------------------- */
 
 .navbar.is-over-orange .navbar__links a {
@@ -154,6 +218,10 @@
 
 /* No hover override: the bar's ordinary hover is an orange tint with orange
    ink, which is exactly what a white panel wants. */
+
+.navbar.is-over-orange .navbar__burger {
+  border-color: rgb(242 110 9 / 0.3);
+}
 
 .navbar.is-over-orange .navbar__cta {
   background-color: #fff;
@@ -172,7 +240,7 @@
    white flattening a dark bar would need is deliberately absent. */
 
 .navbar.is-over-orange.is-scrolled .navbar__bar {
-  border-color: rgb(238 108 9 / 0.14);
+  border-color: rgb(242 110 9 / 0.14);
   background-color: rgb(255 255 255 / 0.92);
   box-shadow: 0 calc(8 * var(--u)) calc(24 * var(--u)) rgb(43 28 18 / 0.10);
 }
@@ -184,7 +252,99 @@
    -------------------------------------------------------------------------- */
 
 @media (max-width: 700px) {
+  /* Burger, mark, call to action. The two outer tracks are a matched 1fr so
+     the mark is centred on the BAR rather than in whatever gap the two
+     controls happen to leave - they are different widths, and an `auto` middle
+     track would sit the logo off-centre by half that difference. The links
+     leave the grid entirely below (they are positioned), so they take no track
+     here. */
+  .navbar__bar {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  /* `grid-row: 1` on all three, here and below. The burger is LAST in the
+     markup but first in the bar, and grid's placement cursor does not go
+     backwards: with only a column given, the logo and the call to action take
+     row 1, and the burger's column 1 then resolves on a second row underneath
+     them. Pinning the row makes each position definite in both axes, so the
+     DOM order stops mattering. */
+  .navbar__burger {
+    grid-row: 1;
+    grid-column: 1;
+    justify-self: start;
+    display: grid;
+    /* Hard pixels, deliberately, in a stylesheet that is otherwise all --u:
+       --u sits on its 0.72 floor throughout a phone, so the 42u box above
+       renders at 30px - under the 44px a finger needs. A tap target is a
+       physical size, not a scaled one, so it does not follow the design knob. */
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* The row of links becomes a panel hanging under the bar. Same <nav>, same
+     six anchors: a separate mobile list would be a second thing to keep in
+     step with the bar and the footer. */
+  .navbar__logo {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: center;
+  }
+
+  .navbar__cta {
+    grid-row: 1;
+    grid-column: 3;
+  }
+
   .navbar__links {
-    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    grid-column: auto;
+    margin-top: calc(8 * var(--u));
+    padding: calc(10 * var(--u));
+    border: 1px solid rgb(242 110 9 / 0.18);
+    border-radius: calc(22 * var(--u));
+    /* Near-opaque, unlike the bar's wash: this panel sits over the page rather
+       than over the hero, and the links have to stay readable against whatever
+       happens to be behind it. */
+    background-color: rgb(255 248 236 / 0.96);
+    -webkit-backdrop-filter: blur(calc(16 * var(--u))) saturate(1.5);
+    backdrop-filter: blur(calc(16 * var(--u))) saturate(1.5);
+    box-shadow: 0 calc(8 * var(--u)) calc(24 * var(--u)) rgb(43 28 18 / 0.16);
+    /* Closed is closed: `visibility` keeps the links out of the tab order and
+       out of reach of a tap, which opacity alone would not. */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(calc(-6 * var(--u)));
+    transition: opacity 0.22s var(--ease-out),
+                transform 0.22s var(--ease-out),
+                visibility 0.22s;
+  }
+
+  .navbar.is-menu-open .navbar__links {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  .navbar__links ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: calc(2 * var(--u));
+  }
+
+  .navbar__links a {
+    /* Same physical floor as the burger: the u-scaled padding alone renders
+       these rows 31px tall, and they are the main way around the site on a
+       phone. Flex rather than a line box so the label centres in the taller
+       row instead of sitting against its top. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: calc(8 * var(--u)) calc(16 * var(--u));
+    border-radius: calc(14 * var(--u));
+    font-size: calc(17 * var(--u));
   }
 }

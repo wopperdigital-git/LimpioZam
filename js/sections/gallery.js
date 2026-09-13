@@ -2,7 +2,7 @@
    GALLERY
    The mosaic's layout is entirely CSS. This adds two things on top: the tiles
    rise into place as the section arrives, and each one drifts at its own rate
-   while it is on screen, which is what stops seven rectangles on one flat
+   while it is on screen, which is what stops eight rectangles on one flat
    colour reading as a static block.
 
    Deliberately not pinned. The page already holds the reader still twice - for
@@ -54,6 +54,15 @@ const HOVER = { grow: 1.035, shrink: 0.97, dur: 0.45 };
 const PUSH_SHARE = 0.6;
 
 /**
+ * How far the picture itself pushes in under the pointer, on top of whatever
+ * its tile is doing. Small, and deliberately larger than the tile's own 1.035:
+ * the two multiply, so the photograph gains about 9% while its frame gains 3,
+ * and the difference between the two is what reads as a zoom rather than as
+ * the whole card simply getting bigger.
+ */
+const MEDIA_ZOOM = 1.06;
+
+/**
  * Parallax range, in pixels of travel across the whole section.
  *
  * Applied to the grid as one plane, never per tile. Giving each tile its own
@@ -92,8 +101,9 @@ export function initGalleryMedia() {
     entries.forEach((entry) => {
       const video = entry.target;
       if (entry.isIntersecting) {
-        // Rejects when there is no decodable source - which is exactly the
-        // state this page ships in, with posters standing in for the footage.
+        // Rejects when the browser declines to start it - a data-saver mode, or
+        // a pause() arriving because the tile left the screen before the clip
+        // had loaded. Neither needs handling: the poster simply stays up.
         video.play().catch(() => {});
       } else {
         video.pause();
@@ -212,16 +222,19 @@ function initHover(grid, tiles) {
 
   const zone = new Map(tiles.map((el) => [el, zoneOf(el)]));
 
-  /* The label and the play badge, gathered once. These ride the tile's scale
-     like everything else inside it, and they are the one part that must not:
-     scaled type is resampled type, so a caption grew about 10% and went soft
-     the moment its tile was hovered, and moving between two small tiles - where
-     the caption is the largest share of the card - made both labels jump size
-     against each other. Counter-scaling holds them still. */
+  /* The play badge, gathered once. It rides the tile's scale like everything
+     else inside it, and it is the one part that must not: the badge should be
+     one size on every tile whatever the hover is doing. Counter-scaling holds
+     it still. */
   const chrome = new Map(tiles.map((el) => [el, [
-    el.querySelector('.gallery__caption'),
     el.querySelector('.gallery__play'),
   ].filter(Boolean)]));
+
+  /* The picture inside each tile. It is the one thing here that should scale
+     with the tile rather than against it - the caption and badge hold still,
+     this leans in. Safe to own `scale` outright: nothing else touches the
+     media element, and the tile clips it, so the zoom never spills. */
+  const media = new Map(tiles.map((el) => [el, el.querySelector('img, video')]));
 
   const apply = (tile) => {
     if (tile === active) return;
@@ -245,6 +258,16 @@ function initHover(grid, tiles) {
       // transition on their own; only the scale needs tweening here, because
       // GSAP already owns this element's transform and inline styles win.
       el.classList.toggle('is-lifted', lifted);
+
+      const shot = media.get(el);
+      if (shot) {
+        gsap.to(shot, {
+          scale: lifted ? MEDIA_ZOOM : 1,
+          duration: HOVER.dur,
+          ease: 'power3.out',
+          overwrite: 'auto',
+        });
+      }
 
       gsap.to(el, {
         scale: lifted ? HOVER.grow : (tile ? HOVER.shrink : 1),

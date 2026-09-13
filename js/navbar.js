@@ -30,6 +30,48 @@ export function initNavbar() {
 
   if (!bar) return;
 
+  /* ---- Phone menu -------------------------------------------------------
+     The burger opens the same <nav> the wide bar shows inline; CSS decides
+     which of the two it is at any width. Everything here is a no-op on a
+     desktop, where the button is `display: none` and cannot be reached. */
+  const burger = document.querySelector('.navbar__burger');
+  const menu = document.querySelector('.navbar__links');
+
+  const menuOpen = () => bar.classList.contains('is-menu-open');
+
+  const setMenu = (open) => {
+    if (open === menuOpen()) return;
+    bar.classList.toggle('is-menu-open', open);
+    if (burger) {
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+  };
+
+  if (burger) {
+    burger.addEventListener('click', () => setMenu(!menuOpen()));
+
+    // Tapping a link navigates, so the menu has done its job.
+    if (menu) {
+      menu.addEventListener('click', (e) => {
+        if (e.target.closest('a')) setMenu(false);
+      });
+    }
+
+    // Anywhere off the bar closes it. The burger and the panel are both inside
+    // `bar`, so neither of them trips this.
+    document.addEventListener('click', (e) => {
+      if (menuOpen() && !bar.contains(e.target)) setMenu(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menuOpen()) {
+        setMenu(false);
+        burger.focus();   // back to the control that opened it
+      }
+    });
+  }
+
   /**
    * Whether the bar is currently sitting over a given section. Measured off the
    * element rather than its pin spacer: the spacer holds the place in the flow,
@@ -60,6 +102,11 @@ export function initNavbar() {
   const sync = () => {
     const y = window.scrollY;
 
+    // The bar fades out entirely across the hero. An open menu would fade with
+    // it and leave the reader with an invisible panel over the page, so a
+    // scroll closes it.
+    setMenu(false);
+
     bar.classList.toggle('is-scrolled', y > GLASS_AT);
     // The orange grounds are full bleeds of the brand colour, on which the
     // bar's ordinary colours all but disappear. Everything flips over them.
@@ -83,7 +130,7 @@ export function initNavbar() {
     bar.style.visibility = shown < 0.02 ? 'hidden' : '';
   };
 
-  const remeasure = () => { run = heroRun(); sync(); };
+  const remeasure = () => { setMenu(false); run = heroRun(); sync(); };
 
   sync();
   window.addEventListener('scroll', sync, { passive: true });

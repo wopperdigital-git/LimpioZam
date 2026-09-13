@@ -11,8 +11,8 @@
      deep orange through amber to golden yellow on a near-white ground. No cool
      tones at all - the teal that used to be --c-secondary is gone. */
   --c-text: #2b1c12;      /* default font color */
-  --c-primary: #ee6c09;   /* deep orange - accents, actions, section two */
-  --c-secondary: #fec22a; /* golden yellow - the second ground */
+  --c-primary: #f26e09;   /* orange - accents, actions, section two */
+  --c-secondary: #ffc42a; /* golden yellow - the second ground, section two's waves */
   --c-bg: #fbf9f4;        /* page background */
 
   /* Typography */
@@ -169,6 +169,38 @@ p {
 :focus-visible {
   outline: 2px solid var(--c-primary);
   outline-offset: 3px;
+}
+
+/* Off-screen until focused, rather than `display: none` - a hidden element is
+   not focusable at all, so it could never be reached by the Tab that is
+   supposed to reveal it. It sits above the navbar's z-index: 100. */
+.skip-link {
+  position: fixed;
+  top: calc(12 * var(--u));
+  left: calc(12 * var(--u));
+  z-index: 200;
+  padding: calc(12 * var(--u)) calc(20 * var(--u));
+  border-radius: calc(10 * var(--u));
+  /* Dark ink rather than the brand orange. Cream on --c-primary measures
+     2.85:1, under the 4.5 this size needs; on the ink it is 13.6:1. This is an
+     accessibility affordance, so it is the one control that cannot be styled
+     for the brand at the cost of being hard to read. */
+  background-color: var(--c-text);
+  color: var(--c-bg);
+  font-size: calc(16 * var(--u));
+  font-weight: var(--fw-semibold);
+  transform: translateY(calc(-200%));
+  transition: transform 0.2s var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* The target takes focus programmatically so the next Tab continues from the
+   content, but it is not a control and must not show a ring of its own. */
+#main:focus {
+  outline: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

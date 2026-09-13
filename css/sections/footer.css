@@ -33,10 +33,13 @@
 
 .footer__inner {
   display: grid;
-  grid-template-columns: 1fr repeat(3, calc(206 * var(--u)));
-  column-gap: calc(24 * var(--u));
-  row-gap: calc(96 * var(--u));
-  /* No max-width and no auto margin: the panel's own padding is the margin
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: calc(48 * var(--u));
+  row-gap: calc(72 * var(--u));
+  /* Two cells in the top row - lead left, contact right - and the base band
+     spanning under both.
+
+     No max-width and no auto margin: the panel's own padding is the margin
      now, so a centred fixed-width band would sit inside it and pull the
      contents off the line the sections above hold. */
 }
@@ -44,6 +47,14 @@
 /* --------------------------------------------------------------------------
    Lead - heading and call to action
    -------------------------------------------------------------------------- */
+
+/* Measured, not incidental: at the full 1256u panel width the two title lines
+   set to about 430u and the rest was empty. This is a shade wider than the
+   longest line ("deep clean?" at 60u), so the break after "Ready for a" is the
+   one the type wants and does not shift when the panel resizes. */
+.footer__lead {
+  max-width: calc(560 * var(--u));
+}
 
 .footer__title {
   font-family: var(--font-body);
@@ -77,55 +88,133 @@
 }
 
 .footer__cta:hover {
-  background-color: #d45f04;
+  background-color: #d76208;
   transform: translateY(calc(-2 * var(--u)));
 }
 
 /* --------------------------------------------------------------------------
-   Link columns
+   Contact block
    -------------------------------------------------------------------------- */
 
-.footer__col-title {
-  margin-bottom: calc(18 * var(--u));
+.footer__contact {
+  /* <address> is italic by default, which would put it in the same voice as
+     the accent type in the heading beside it. */
+  font-style: normal;
+  /* Anchored to the panel's right edge, the same edge the link row below and
+     every section heading above are set against. */
+  justify-self: end;
+  /* Measured: the columns want 226u and 314u, plus the 40u between them, so
+     two columns need 580u before the Facebook row starts wrapping. This is
+     that plus slack. Everything here scales with --u, so the ratio - and the
+     fit - holds at every viewport width. */
+  max-width: calc(600 * var(--u));
+}
+
+.footer__contact-title {
+  margin-bottom: calc(20 * var(--u));
   font-size: calc(16 * var(--u));
-  /* 0.62 is where this ink clears 4.5:1 on the cream; at 0.45 it measured
-     2.78 and these labels were the least readable text on the page. Still
-     clearly subordinate to the 0.85 links under them. */
+  /* 0.62 is where this ink clears 4.5:1 on the cream - the same value the old
+     column headings used, and for the same reason. */
   color: rgb(43 28 18 / 0.62);
 }
 
-.footer__col li + li {
-  margin-top: calc(12 * var(--u));
+/* Two columns, filling row-wise: the two ways of reaching a person directly on
+   the top row, the two page links underneath. */
+.footer__contact ul {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: calc(16 * var(--u)) calc(40 * var(--u));
 }
 
-.footer__col a {
+.footer__contact li {
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+}
+
+.footer__contact a {
   font-size: calc(18 * var(--u));
   color: rgb(43 28 18 / 0.85);
+  /* The email and the page name are both long enough to wrap on a narrow
+     panel; breaking them mid-word beats pushing the panel wider. */
+  overflow-wrap: anywhere;
   transition: color 0.2s var(--ease-out);
 }
 
-.footer__col a:hover {
+.footer__contact a:hover {
   color: var(--c-primary);
 }
 
+/* The tinted disc keeps the icons from reading as loose marks in the margin,
+   and matches the treatment the FAQ chevrons already use. */
+.footer__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: calc(36 * var(--u));
+  height: calc(36 * var(--u));
+  border-radius: 50%;
+  background-color: rgb(242 110 9 / 0.12);   /* --c-primary at 12% */
+  color: var(--c-primary);
+}
+
+.footer__icon svg {
+  width: calc(18 * var(--u));
+  height: calc(18 * var(--u));
+}
+
 /* --------------------------------------------------------------------------
-   Base - mark and small print, centred under everything
+   Base band - identity on the left, links on the right, over a hairline
    -------------------------------------------------------------------------- */
 
 .footer__base {
   grid-column: 1 / -1;
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(24 * var(--u)) calc(48 * var(--u));
+  padding-top: calc(36 * var(--u));
+  /* Hairline rather than a gap alone: it gives the row a top edge to sit on,
+     which is what stops the band reading as a stray line of small print. Kept
+     faint - this is a seam, not a divider competing with the type. */
+  border-top: 1px solid rgb(43 28 18 / 0.12);
 }
 
-/* base.css makes every image a block, so the auto margins are what centre it. */
+.footer__identity {
+  display: flex;
+  align-items: center;
+  gap: calc(14 * var(--u));
+}
+
+/* base.css makes every image a block. The mark sits beside the small print
+   now, so it needs neither the auto margins that used to centre it nor the
+   bottom margin that used to separate the two. */
 .footer__mark {
   width: calc(44 * var(--u));
-  margin: 0 auto calc(16 * var(--u));
+  flex: none;
+}
+
+.footer__nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(12 * var(--u)) calc(28 * var(--u));
+}
+
+.footer__nav a {
+  font-size: calc(18 * var(--u));
+  color: rgb(43 28 18 / 0.85);   /* clears 4.5:1 on the cream */
+  transition: color 0.2s var(--ease-out);
+}
+
+.footer__nav a:hover {
+  color: var(--c-primary);
 }
 
 .footer__legal {
   font-size: calc(15 * var(--u));
   line-height: 1.6;
+  text-align: left;
   color: rgb(43 28 18 / 0.62);   /* 3.2:1 at 0.5; this clears 4.5 */
 }
 
@@ -179,9 +268,26 @@
 }
 
 /* --------------------------------------------------------------------------
+   Narrow desktops and tablets
+   Below about 922px --u is pinned at its 0.72 floor, so the contact block
+   stops shrinking with the window and starts eating the lead instead: two
+   columns hold 432px of a 648px panel at 760px wide, which squeezed the
+   heading to five lines. 900px is where the lead still clears 400u with the
+   block beside it - past that the list goes single file, and the heading gets
+   its width back.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .footer__contact ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
    Phones
-   The panel's four columns come down to one; 1fr plus three 206u columns needs
-   445px before gaps, which no phone has.
+   The base band has nowhere near the width to hold identity and links side by
+   side, so it stacks and centres - which is where the mark and the small print
+   sat on a phone before the band existed.
    -------------------------------------------------------------------------- */
 
 @media (max-width: 700px) {
@@ -195,7 +301,44 @@
     row-gap: calc(48 * var(--u));
   }
 
+  /* Stacked, so it runs to the same left edge as the heading above it rather
+     than sitting off to one side. */
+  .footer__contact {
+    justify-self: stretch;
+    max-width: none;
+  }
+
+  /* The measure only exists to stop the title running the full width of a
+     desktop panel. A phone is narrower than it, so it would only box the
+     heading in. */
+  .footer__lead {
+    max-width: none;
+  }
+
   .footer__base {
-    grid-column: auto;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Mark back above the small print, both centred. */
+  .footer__identity {
+    flex-direction: column;
+    gap: calc(16 * var(--u));
+  }
+
+  .footer__legal {
+    text-align: center;
+  }
+
+  /* Left to wrap, the six links break 5 + 1 and leave "Contact" stranded on a
+     line of its own: they come to 371px against 356px of content width. A
+     three-column grid splits them 3 + 3 instead, and the wider column gap
+     keeps the tap targets apart at this size. */
+  .footer__nav ul {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    justify-content: center;
+    gap: calc(16 * var(--u)) calc(24 * var(--u));
   }
 }

@@ -36,18 +36,112 @@
      wearing it when the pin releases.
 
      The type on it is white by decision, not by calculation - white lands at
-     2.74:1 here, under both the 4.5:1 body floor and the 3:1 large-text one.
-     Dark brown would measure 5.99:1 if that trade is ever revisited; so would
-     keeping white and darkening this ground, but the ground has to stay exactly
-     the hero's paint or the hand-off shows a seam. */
+     3.00:1 on #f26e09: it meets the 3:1 large-text floor but not the 4.5:1
+     body one. Dark brown would measure 5.49:1 if that trade is ever revisited;
+     so would keeping white and darkening this ground, but the ground has to
+     stay exactly the hero's paint or the hand-off shows a seam. */
   background-color: var(--c-primary);
 }
 
 .reasons__viewport {
+  /* Above the waves, which are this section's own background. */
+  position: relative;
+  z-index: 1;
   /* Without JS this degrades to an ordinary horizontal scroller, so the content
      stays reachable if the pinned animation never initialises. */
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Waves
+   A quiet field of gold waves running diagonally behind the whole section.
+   Tone on tone: the gold token at a quarter strength, so the bands read as a
+   texture in the orange rather than as shapes laid on it - which is what lets
+   them pass behind the type. White on the blend is 2.57:1, against 3.00 on the
+   bare orange; on the full gold it would be 1.59.
+
+   Every band is wavy along both edges and far longer than the section, and the
+   field around them is oversized, so no straight edge or cut end ever comes
+   into view - at rest, while a band slides in, or at the far end of the drift.
+   The tightest margin is a phone mid slide-in, where a band's tip still sits
+   83px beyond the farthest corner.
+
+   The shape is a mask and the colour is the token, so the gold follows
+   --c-secondary. The file is one period of the band, and both of its edges
+   start and end on the same height and slope, which is what lets repeat-x tile
+   it without a seam.
+   -------------------------------------------------------------------------- */
+
+.reasons__waves {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;   /* the field is far larger than the section */
+  pointer-events: none;
+  /* The waves dissolve into the section's top and bottom edges rather than
+     stopping at them. The ground above and below is the same orange, so a clip
+     there is a hard straight line drawn across every band - hidden while the
+     section is pinned to the window, and plain to see while it scrolls in,
+     which is exactly when the entrance plays, and again as it scrolls out. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 calc(160 * var(--u)), #000 calc(100% - 160 * var(--u)), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 calc(160 * var(--u)), #000 calc(100% - 160 * var(--u)), transparent);
+}
+
+/* Unrotated, so the drift in reasons.js moves the field straight sideways with
+   the strip rather than along the diagonal.
+
+   `will-change` here and on each band is what keeps this section smooth, not a
+   nicety. Without their own layers the masked bands - seven of them, each
+   thousands of pixels wide - were repainted on every frame of the pinned
+   scroll: 84ms a frame at 1920x1080, about 12fps. On their own layers each is
+   rasterised once and the drift is a compositor move: 16.7ms, a steady 60. */
+.reasons__waves-drift {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.reasons__waves-field {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  /* Sized for the worst of both layouts: a wide desktop at full drift, and a
+     phone stack more than three times taller than it is wide. */
+  width: 320%;
+  height: 210%;
+  opacity: 0.25;   /* on the field, so each band's own fade-in can run to 1 */
+  transform: translate(-50%, -50%) rotate(-22deg);
+}
+
+.reasons__wave {
+  flex: none;
+  will-change: transform;   /* its own layer - see .reasons__waves-drift */
+  height: calc(120 * var(--u));
+  background-color: var(--c-secondary);
+  -webkit-mask: url(../../assets/images/reasons-wave.svg) 0 0 / calc(1200 * var(--u)) 100% repeat-x;
+  mask: url(../../assets/images/reasons-wave.svg) 0 0 / calc(1200 * var(--u)) 100% repeat-x;
+}
+
+/* Seven of one shape read as a printed pattern. Varying the period, the phase
+   and the thickness is enough for them to read as separate waves. */
+.reasons__wave:nth-child(2n) {
+  height: calc(90 * var(--u));
+  -webkit-mask-size: calc(1500 * var(--u)) 100%;
+  mask-size: calc(1500 * var(--u)) 100%;
+  -webkit-mask-position: calc(-420 * var(--u)) 0;
+  mask-position: calc(-420 * var(--u)) 0;
+}
+
+.reasons__wave:nth-child(3n) {
+  height: calc(145 * var(--u));
+  -webkit-mask-size: calc(1000 * var(--u)) 100%;
+  mask-size: calc(1000 * var(--u)) 100%;
+  -webkit-mask-position: calc(-700 * var(--u)) 0;
+  mask-position: calc(-700 * var(--u)) 0;
 }
 
 .reasons__strip {
@@ -132,7 +226,16 @@
   width: calc(var(--card-w) * var(--u));
   height: calc(var(--card-h) * var(--u));
   border-radius: calc(12 * var(--u));
+  /* Shows while the photograph decodes, and for good if one ever fails to
+     load - so a card is never a hole in the orange. */
   background-color: var(--c-secondary);
+  /* The card owns the shape and the photograph fills it. base.css sets
+     `height: auto` on every image to stop them distorting; the explicit
+     height above outranks it, and this is what keeps the picture undistorted
+     instead. The files are already cut to the card's own 348:277, so on a
+     desktop this crops nothing - it earns its place on a phone, where the
+     card is wider than it is tall. */
+  object-fit: cover;
 }
 
 /* --------------------------------------------------------------------------
